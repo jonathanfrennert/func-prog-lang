@@ -1,2 +1,7 @@
+import PrettyPrinterTest
+
+import Test.QuickCheck
+import PrettyPrinterTest
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = quickCheck propPrettyPrint

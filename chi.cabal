@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5860651b23be8c20febd26f350af2d8bad98537d08e986e2b09ddf882a84182e
+-- hash: b6c3c25efe1d2ebbce97c0337fec52b622dd26e690d992e703e4bb2d7cba71d5
 
 name:           chi
 version:        0.1.0.0
@@ -27,7 +27,9 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Language
+      PrettyPrinter
+      StdPrelude
   other-modules:
       Paths_chi
   hs-source-dirs:
@@ -52,11 +54,13 @@ test-suite chi-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      PrettyPrinterTest
       Paths_chi
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , chi
   default-language: Haskell2010

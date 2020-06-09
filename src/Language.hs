@@ -24,8 +24,8 @@ type CoreAlt = Alter Name
 
 type IsRec = Bool
 recursive, nonRecursive :: IsRec
-recursive = True
-nonRecursive = False
+recursive     = True
+nonRecursive  = False
 
 type Program a = [ScDefn a]
 type CoreProgram = Program Name
@@ -44,4 +44,4 @@ rhssOf defns = [rhs | (name, rhs) <- defns]
 isAtomicExpr :: Expr a -> Bool
 isAtomicExpr (EVar v) = True
 isAtomicExpr (ENum n) = True
-isAtomicExpr e = False
+isAtomicExpr e        = False
