@@ -42,6 +42,6 @@ rhssOf :: [(a,b)] -> [b]
 rhssOf defns = [rhs | (name, rhs) <- defns]
 
 isAtomicExpr :: Expr a -> Bool
-isAtomicExpr (EVar v) = True
-isAtomicExpr (ENum n) = True
-isAtomicExpr e        = False
+isAtomicExpr (EVar _) = True
+isAtomicExpr (ENum _) = True
+isAtomicExpr _        = False
