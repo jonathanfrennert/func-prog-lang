@@ -1,6 +1,6 @@
 module PrettyPrintOps where
 
-import Language
+import Syntax
 import PrettyPrintBase
 
 pprint :: CoreProgram -> String

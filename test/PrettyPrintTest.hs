@@ -1,6 +1,6 @@
 module PrettyPrintTest (propTimeComplexity) where
 
-import Language
+import Syntax
 import PrettyPrintBase
 import PrettyPrintOps
 import Test.QuickCheck

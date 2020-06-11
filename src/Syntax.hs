@@ -1,4 +1,4 @@
-module Language where
+module Syntax where
 
 data Expr a
   = EVar Name                 -- ^ Variables
@@ -36,10 +36,10 @@ type CoreScDefn = ScDefn Name
 -- | Helper methods
 
 bindersOf :: [(a,b)] -> [a]
-bindersOf defns = [name | (name, rhs) <- defns]
+bindersOf = map fst
 
 rhssOf :: [(a,b)] -> [b]
-rhssOf defns = [rhs | (name, rhs) <- defns]
+rhssOf = map snd
 
 isAtomicExpr :: Expr a -> Bool
 isAtomicExpr (EVar _) = True

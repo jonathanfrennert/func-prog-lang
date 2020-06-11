@@ -1,6 +1,6 @@
 module StdPrelude where
 
-import Language
+import Syntax
 
 preludeDefs :: CoreProgram
 preludeDefs
