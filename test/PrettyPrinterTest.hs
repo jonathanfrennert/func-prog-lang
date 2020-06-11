@@ -5,7 +5,7 @@ import PrettyPrinter
 import Test.QuickCheck
 
 -- | Measure the number of steps required to compute pretty printer.
--- Computational complexity should be O(n^2). (EX 1.1)
+-- Computational complexity should be O(n^2) (EX 1.1).
 
 mkMultiAp :: Int -> CoreExpr -> CoreExpr -> CoreExpr
 mkMultiAp n e1 e2 = foldl EAp e1 (take n e2s)
