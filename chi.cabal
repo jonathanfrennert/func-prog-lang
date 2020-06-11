@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b6c3c25efe1d2ebbce97c0337fec52b622dd26e690d992e703e4bb2d7cba71d5
+-- hash: e9937d57adb78744ccf32a1b5662e58afc813f694d1b492e22a7848b32787cf2
 
 name:           chi
 version:        0.1.0.0
@@ -28,7 +28,8 @@ source-repository head
 library
   exposed-modules:
       Language
-      PrettyPrinter
+      PrettyPrintBase
+      PrettyPrintOps
       StdPrelude
   other-modules:
       Paths_chi
@@ -54,7 +55,7 @@ test-suite chi-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      PrettyPrinterTest
+      PrettyPrintTest
       Paths_chi
   hs-source-dirs:
       test

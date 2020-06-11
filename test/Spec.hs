@@ -1,7 +1,5 @@
-import PrettyPrinterTest
-
 import Test.QuickCheck
-import PrettyPrinterTest
+import PrettyPrintTest
 
 main :: IO ()
-main = quickCheck propPrettyPrint
+main = quickCheck propTimeComplexity

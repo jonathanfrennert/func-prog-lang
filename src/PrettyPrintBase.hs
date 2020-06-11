@@ -1,4 +1,4 @@
-module PrettyPrinterBase where
+module PrettyPrintBase where
 
 data Iseq = INil
           | IStr String
@@ -22,6 +22,8 @@ iStr :: String -> Iseq
 iStr str = IStr str
 
 iAppend :: Iseq -> Iseq -> Iseq
+iAppend INil iq = iq
+iAppend iq INil = iq 
 iAppend iq1 iq2 = IAppend iq1 iq2
 
 iIndent  :: Iseq -> Iseq

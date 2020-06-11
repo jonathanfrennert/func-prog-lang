@@ -1,7 +1,7 @@
-module PrettyPrinter where
+module PrettyPrintOps where
 
 import Language
-import PrettyPrinterBase
+import PrettyPrintBase
 
 pprint :: CoreProgram -> String
 pprint prog = iDisplay (pprProgram prog)
