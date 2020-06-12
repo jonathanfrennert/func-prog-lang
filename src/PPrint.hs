@@ -1,7 +1,7 @@
-module PrettyPrintOps where
+module PPrint where
 
 import Syntax
-import PrettyPrintBase
+import PPrintType
 
 pprint :: CoreProgram -> String
 pprint prog = iDisplay (pprProgram prog)

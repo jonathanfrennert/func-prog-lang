@@ -1,19 +1,27 @@
-module PrettyPrintBase where
+module PPrintType where
+
+import Utils
 
 data Iseq = INil
           | IStr String
           | IAppend Iseq Iseq
+          | IIndent Iseq
+          | INewline
 
 -- | Turn an iseq into a string
 iDisplay :: Iseq -> String
-iDisplay iq = flatten [iq]
+iDisplay iq = flatten 0 [(iq, 0)]
 
 -- | Concatenates all iseqs in a list as a string.
-flatten :: [Iseq] -> String
-flatten [] = ""
-flatten (INil : iqs) = flatten iqs
-flatten (IStr s : iqs) = s ++ (flatten iqs)
-flatten (IAppend iq1 iq2 : iqs) = flatten (iq1 : iq2 : iqs)
+flatten :: Int              -- ^ Current column; 0 for first column
+        -> [(Iseq, Int)]    -- ^ Work list
+        -> String
+flatten _ []                                   = ""
+flatten col ((INil, _) : iqs)                  = flatten col iqs
+flatten col ( (IStr s, _) : iqs)               = s ++ (flatten (col + length s)  iqs)
+flatten col ( (IAppend iq1 iq2, indent) : iqs) = flatten col ( (iq1, indent) : (iq2, indent) : iqs)
+flatten col ( (IIndent iq, _) : iqs)           = flatten col ( (iq, col) : iqs)
+flatten col ( (INewline, indent) : iqs)        = '\n' : space indent ++ (flatten indent iqs)
 
 iNil :: Iseq  -- ^ The empty iseq
 iNil = INil
@@ -27,11 +35,11 @@ iAppend iq INil = iq
 iAppend iq1 iq2 = IAppend iq1 iq2
 
 iIndent  :: Iseq -> Iseq
-iIndent iq = iq
+iIndent iq = IIndent iq
 
 -- | New line with indentation
 iNewline :: Iseq
-iNewline = IStr "\n"
+iNewline = INewline
 
 iNum :: Int -> Iseq
 iNum = iStr.show
