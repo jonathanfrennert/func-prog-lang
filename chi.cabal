@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 29c2d5af2c31f567aca265d4ccd5f54fb263c43ff766626725559f668d6cd605
+-- hash: 674aec7906e02c3b9007b0071996395ab3addfb3e20d71d9d358509ba6fa398f
 
 name:           chi
 version:        0.1.0.0
@@ -56,8 +56,7 @@ test-suite chi-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      PPrintTest
-      TestUtils
+      PPrintTests
       Paths_chi
   hs-source-dirs:
       test
@@ -67,4 +66,5 @@ test-suite chi-test
     , QuickCheck
     , base >=4.7 && <5
     , chi
+    , hspec
   default-language: Haskell2010

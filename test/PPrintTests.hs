@@ -1,20 +1,24 @@
-module PPrintTest where
+module PPrintTests(pprTests) where
 
 import Syntax
 import PPrint
 import PPrintType
-import TestUtils
 
-import qualified Test.HUnit as H
-import qualified Test.QuickCheck as Q
+import Test.Hspec
+import Test.HUnit
+import Test.QuickCheck
 
-pprHTests :: H.Test
-pprHTests = H.TestList
-  [ H.TestLabel "pprLayout" layoutTest
-  , H.TestLabel "pprNewline" newLineTest
-  ]
+pprTests :: IO ()
+pprTests = hspec $ do
+  describe "pprExpr" $ do
+    it "has a linear time complexity." $ property $
+      propTimeComplexity
 
-pprQTests = [propTimeComplexity]
+    it "can print letrec." $ do
+      (pprCore letLayoutExample) `shouldBe` letLayoutStr
+
+    it "can print EVar with newline." $ do
+      (pprCore newLineExpr) `shouldBe` newLineStr
 
 pprCore :: CoreExpr -> String
 pprCore = iDisplay.pprExpr
@@ -30,8 +34,8 @@ mkMultiAp n e1 e2 = foldl EAp e1 (take n e2s)
 prettyPrintLen :: Int -> Int
 prettyPrintLen n = length.iDisplay.pprExpr $ mkMultiAp n (EVar "f") (EVar "x")
 
-propTimeComplexity :: Int -> Q.Property
-propTimeComplexity n = (n > 0) Q.==> (res >= n - 10)
+propTimeComplexity :: Int -> Property
+propTimeComplexity n = (n > 0) ==> (res >= n - 10)
                              && (res <= 10 * n)
     where
       res = prettyPrintLen n
@@ -46,12 +50,6 @@ letLayoutExample = ELet True
 letLayoutStr :: String
 letLayoutStr = "letrec\n k = Hello, world;\n n = Goodbye, world\nin f x (g x)"
 
-layoutTest :: H.Test
-layoutTest = H.TestCase (
-  H.assertEqual "Pretty print ofletrec statements is incorrect"
-  (pprCore letLayoutExample)
-  letLayoutStr)
-
 -- | Check if layout works when printing string with newline character (EX 1.7)
 
 newLineExpr :: CoreExpr
@@ -59,9 +57,3 @@ newLineExpr = EVar "newline\nnewline\n,give me a two time"
 
 newLineStr :: String
 newLineStr = "newline\nnewline\n,give me a two time"
-
-newLineTest :: H.Test
-newLineTest = H.TestCase (
-  H.assertEqual "Pretty print of EVar with newline is incorrect"
-  (pprCore newLineExpr)
-  newLineStr)

@@ -1,9 +1,4 @@
-import TestUtils
-import PPrintTest
-
-import Test.HUnit
+import PPrintTests
 
 main :: IO ()
-main = do { runTestTT pprHTests
-          ; runTestQC pprQTests
-          }
+main = do pprTests

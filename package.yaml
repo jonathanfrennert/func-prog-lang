@@ -46,5 +46,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - chi
+    - hspec
     - HUnit
     - QuickCheck
