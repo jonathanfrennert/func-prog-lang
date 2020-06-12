@@ -27,7 +27,13 @@ iNil :: Iseq  -- ^ The empty iseq
 iNil = INil
 
 iStr :: String -> Iseq
-iStr str = IStr str
+iStr str
+  | length str == length firstLine = IStr str
+  | otherwise                      = iInterleave INewline (map iStr $ lines str)
+  where
+    firstLine = takeWhile (/= '\n') str
+
+
 
 iAppend :: Iseq -> Iseq -> Iseq
 iAppend INil iq = iq

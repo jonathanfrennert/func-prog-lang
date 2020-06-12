@@ -5,6 +5,9 @@ import PPrint
 import PPrintType
 import Test.QuickCheck
 
+pprCore :: CoreExpr -> String
+pprCore = iDisplay.pprExpr
+
 -- | Measure the number of steps required to compute pretty printer.
 -- Computational complexity should be linear (EX 1.4).
 
@@ -22,12 +25,26 @@ propTimeComplexity n = (n > 0) ==> (res >= n - 10)
     where
       res = prettyPrintLen n
 
--- | Check if the layout works properly for ELet (EX 1.6) + (EX 1.7).
+-- | Check if the layout works properly for 'ELet' (EX 1.6).
 
 letLayoutExample :: CoreExpr
 letLayoutExample = ELet True
   [("k", EVar "Hello, world"), ("n", EVar "Goodbye, world")]
   (EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x")))
 
-layoutTest :: IO ()
-layoutTest = putStr.iDisplay.pprExpr $ letLayoutExample
+letLayoutStr :: String
+letLayoutStr = "letrec\n k = Hello, world;\n n = Goodbye, world\nin f x (g x)"
+
+layoutTest :: Bool
+layoutTest = letLayoutStr == pprCore letLayoutExample
+
+-- | Check if layout works when printing string with newline character (EX 1.7)
+
+newLineExpr :: CoreExpr
+newLineExpr = EVar "newline\nnewline\n,give me a two time"
+
+newLineStr :: String
+newLineStr = "newline\nnewline\n,give me a two time"
+
+newLineTest :: Bool
+newLineTest = newLineStr == pprCore newLineExpr

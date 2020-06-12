@@ -3,4 +3,5 @@ import PPrintTest
 
 main :: IO ()
 main = do { quickCheck propTimeComplexity
-          ; layoutTest}
+          ; print layoutTest
+          ; print newLineTest}
