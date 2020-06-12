@@ -33,8 +33,6 @@ iStr str
   where
     firstLine = takeWhile (/= '\n') str
 
-
-
 iAppend :: Iseq -> Iseq -> Iseq
 iAppend INil iq = iq
 iAppend iq INil = iq
