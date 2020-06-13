@@ -14,14 +14,17 @@ pprTests = hspec $ do
     it "has a linear time complexity." $ property $
       propTimeComplexity
 
-    it "can print letrec." $ do
+    it "can print 'ELet' layout." $ do
       (pprCore letLayoutExample) `shouldBe` letLayoutStr
 
-    it "can print EVar with newline." $ do
+    it "can print 'EVar' with newline." $ do
       (pprCore newLineExpr) `shouldBe` newLineStr
 
+    it "can avoid printing uneccesary parantheses via order precedence." $ do
+      (pprCore precExpr) `shouldBe` precStr
+
 pprCore :: CoreExpr -> String
-pprCore = iDisplay.pprExpr
+pprCore = iDisplay.(flip pprExpr $ 0)
 
 -- | Measure the number of steps required to compute pretty printer.
 -- Computational complexity should be linear (EX 1.4).
@@ -32,7 +35,7 @@ mkMultiAp n e1 e2 = foldl EAp e1 (take n e2s)
     e2s = e2 : e2s
 
 prettyPrintLen :: Int -> Int
-prettyPrintLen n = length.iDisplay.pprExpr $ mkMultiAp n (EVar "f") (EVar "x")
+prettyPrintLen n = length.iDisplay.(flip pprExpr $ 0) $ mkMultiAp n (EVar "f") (EVar "x")
 
 propTimeComplexity :: Int -> Property
 propTimeComplexity n = (n > 0) ==> (res >= n - 10)
@@ -45,10 +48,10 @@ propTimeComplexity n = (n > 0) ==> (res >= n - 10)
 letLayoutExample :: CoreExpr
 letLayoutExample = ELet True
   [("k", EVar "Hello, world"), ("n", EVar "Goodbye, world")]
-  (EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x")))
+  (EAp (EAp (EVar "l") (EAp (EVar "f") (EVar "x"))) (EAp (EVar "g") (EVar "x")))
 
 letLayoutStr :: String
-letLayoutStr = "letrec\n k = Hello, world;\n n = Goodbye, world\nin f x (g x)"
+letLayoutStr = "letrec\n k = Hello, world;\n n = Goodbye, world\nin l (f x) (g x)"
 
 -- | Check if layout works when printing string with newline character (EX 1.7)
 
@@ -57,3 +60,11 @@ newLineExpr = EVar "newline\nnewline\n,give me a two time"
 
 newLineStr :: String
 newLineStr = "newline\nnewline\n,give me a two time"
+
+-- | Check if order precedence filters out unneccesary parantheses (EX 1.8)
+
+precExpr :: CoreExpr
+precExpr = EAp (EAp (EVar ">") (EAp (EAp (EVar "+") (EVar "x")) (EVar "y"))) (EAp (EAp (EVar "*") (EVar "p")) (EAp (EVar "length") (EVar "xs")))
+
+precStr :: String
+precStr = "x + y > p * length xs"
