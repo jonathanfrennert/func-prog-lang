@@ -51,6 +51,12 @@ iNum = iStr.show
 iSpace :: Iseq
 iSpace = iStr " "
 
+iParL :: Iseq
+iParL = iStr "("
+
+iParR :: Iseq
+iParR = iStr ")"
+
 -- | List seperator
 iSep :: Iseq
 iSep = iConcat [ iStr ";", iNewline ]

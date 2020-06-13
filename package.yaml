@@ -47,5 +47,4 @@ tests:
     dependencies:
     - chi
     - hspec
-    - HUnit
     - QuickCheck

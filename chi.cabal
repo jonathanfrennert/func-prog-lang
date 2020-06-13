@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 674aec7906e02c3b9007b0071996395ab3addfb3e20d71d9d358509ba6fa398f
+-- hash: 6f3743378eb061d68c858b5c41223e7294772ff4ce1201246814ed250179d007
 
 name:           chi
 version:        0.1.0.0
@@ -62,8 +62,7 @@ test-suite chi-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      HUnit
-    , QuickCheck
+      QuickCheck
     , base >=4.7 && <5
     , chi
     , hspec

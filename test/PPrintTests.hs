@@ -5,7 +5,6 @@ import PPrint
 import PPrintType
 
 import Test.Hspec
-import Test.HUnit
 import Test.QuickCheck
 
 pprTests :: IO ()
@@ -20,13 +19,14 @@ pprTests = hspec $ do
     it "can print 'EVar' with newline." $ do
       (pprCore newLineExpr) `shouldBe` newLineStr
 
-    it "can avoid printing uneccesary parantheses via order precedence." $ do
+    it "can handle operator precedence." $ do
       (pprCore precExpr) `shouldBe` precStr
+      (pprCore boolExpr) `shouldBe` boolStr
 
 pprCore :: CoreExpr -> String
-pprCore = iDisplay.(flip pprExpr $ 0)
+pprCore = iDisplay.(flip pprExpr $ noPrec)
 
--- | Measure the number of steps required to compute pretty printer.
+-- | Measure the number of steps required for Pretty-print.
 -- Computational complexity should be linear (EX 1.4).
 
 mkMultiAp :: Int -> CoreExpr -> CoreExpr -> CoreExpr
@@ -35,7 +35,7 @@ mkMultiAp n e1 e2 = foldl EAp e1 (take n e2s)
     e2s = e2 : e2s
 
 prettyPrintLen :: Int -> Int
-prettyPrintLen n = length.iDisplay.(flip pprExpr $ 0) $ mkMultiAp n (EVar "f") (EVar "x")
+prettyPrintLen n = length.iDisplay.(flip pprExpr $ noPrec) $ mkMultiAp n (EVar "f") (EVar "x")
 
 propTimeComplexity :: Int -> Property
 propTimeComplexity n = (n > 0) ==> (res >= n - 10)
@@ -63,8 +63,16 @@ newLineStr = "newline\nnewline\n,give me a two time"
 
 -- | Check if order precedence filters out unneccesary parantheses (EX 1.8)
 
+-- | Case 1
 precExpr :: CoreExpr
 precExpr = EAp (EAp (EVar ">") (EAp (EAp (EVar "+") (EVar "x")) (EVar "y"))) (EAp (EAp (EVar "*") (EVar "p")) (EAp (EVar "length") (EVar "xs")))
 
 precStr :: String
 precStr = "x + y > p * length xs"
+
+-- | Case 2
+boolExpr :: CoreExpr
+boolExpr = EAp (EAp (EVar "&") (EAp (EAp (EVar "|") (EVar "a")) (EVar "b"))) (EAp (EAp (EVar "|") (EVar "c")) (EVar "d"))
+
+boolStr :: String
+boolStr = "(a | b) & (c | d)"
