@@ -43,7 +43,7 @@ propTimeComplexity n = (n > 0) ==> (res >= n - 10)
     where
       res = prettyPrintLen n
 
--- | Check if the layout works properly for 'ELet' (EX 1.6).
+-- | Check if the layout works properly for 'ELet' (EX 1.6)
 
 letLayoutExample :: CoreExpr
 letLayoutExample = ELet True
