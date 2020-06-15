@@ -5,36 +5,38 @@ import Syntax
 import Data.Char
 import Data.List
 
-type Token = String
+type Token = (Int, String)
 
 twoCharOps :: [String]
 twoCharOps = ["==", "˜=", ">=", "<=", "->"]
 
--- | Lexical analysis
-clex :: String -> [Token]
-clex [] = []
-clex ('-' : '-' : cs) = clex $ dropWhile (/= '\n') cs
-clex (c1 : c2 : cs)
-  | [c1, c2] `elem` twoCharOps = [c1,c2] : clex cs
-
-clex (c:cs)
-  | isSpace c = clex cs
+-- | Lexical analysis of a program
+clex :: String    -- ^ Unprocessed program
+     -> Int       -- ^ Current line number
+     -> [Token]
+clex [] _ = []
+clex ('-' : '-' : cs) n = clex (dropWhile (/= '\n') cs) n
+clex (c1 : c2 : cs) n
+  | [c1, c2] `elem` twoCharOps = (n, [c1, c2])  : clex cs n
+clex ('\n' : cs) n = clex cs (n + 1)
+clex (c:cs) n
+  | isSpace c = clex cs n
 
   | isDigit c =
     let
       num_token = c : takeWhile isDigit cs
       rest_cs   = dropWhile isDigit cs
     in
-      num_token : clex rest_cs
+      (n, num_token) : clex rest_cs n
 
   | isAlpha c =
     let
       var_tok = c : takeWhile isIdChar cs
       rest_cs = dropWhile isIdChar cs
     in
-      var_tok : clex rest_cs
-      
-  | otherwise = [c] : clex cs
+      (n, var_tok) : clex rest_cs n
+
+  | otherwise = (n, [c]) : clex cs n
 
 isIdChar :: Char -> Bool
 isIdChar c = isAlpha c || isDigit c || (c == '_')
@@ -44,4 +46,4 @@ syntax :: [Token] -> CoreProgram
 syntax = undefined
 
 parse :: String -> CoreProgram
-parse = syntax.clex.read
+parse = syntax.(flip clex $ 0).read
