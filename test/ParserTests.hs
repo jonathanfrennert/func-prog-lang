@@ -1,7 +1,6 @@
 module ParserTests (parserTests) where
 
-import Parser
-import Syntax
+import Lexer
 
 import Test.Hspec
 import Test.QuickCheck
