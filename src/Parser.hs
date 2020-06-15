@@ -3,12 +3,20 @@ module Parser where
 import Syntax
 
 import Data.Char
+import Data.List
 
 type Token = String
+
+twoCharOps :: [String]
+twoCharOps = ["==", "˜=", ">=", "<=", "->"]
 
 -- | Lexical analysis
 clex :: String -> [Token]
 clex [] = []
+clex ('-' : '-' : cs) = clex $ dropWhile (/= '\n') cs
+clex (c1 : c2 : cs)
+  | [c1, c2] `elem` twoCharOps = [c1,c2] : clex cs
+
 clex (c:cs)
   | isSpace c = clex cs
 
@@ -25,7 +33,7 @@ clex (c:cs)
       rest_cs = dropWhile isIdChar cs
     in
       var_tok : clex rest_cs
-
+      
   | otherwise = [c] : clex cs
 
 isIdChar :: Char -> Bool
