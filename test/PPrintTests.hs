@@ -19,7 +19,7 @@ pprTests = hspec $ do
     it "can print 'EVar' with newline." $ do
       (pprCore newLineExpr) `shouldBe` newLineStr
 
-    it "can handle operator precedence." $ do
+    it "can account for operator precedence." $ do
       (pprCore precExpr) `shouldBe` precStr
       (pprCore boolExpr) `shouldBe` boolStr
 
