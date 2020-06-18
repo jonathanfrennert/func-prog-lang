@@ -1,6 +1,7 @@
 module ParserTests (parserTests) where
 
 import Lexer
+import Parser
 
 import Test.Hspec
 import Test.QuickCheck
@@ -16,6 +17,9 @@ parserTests = hspec $ do
 
     it "can identify two-char operations." $ do
       (clex eqStr 0) `shouldBe` eqToks
+
+    it "can parse simple greeting BNF." $ do
+      (pGreeting $ clex greetingStr 0) `shouldBe` greetingP
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -40,3 +44,19 @@ eqStr = "123ab  ==c_de"
 
 eqToks :: [Token]
 eqToks = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
+
+-- | Check if the parsing can handle greetings (basic BNF) (1.6.2).
+
+pHelloOrGoodbye :: Parser String
+pHelloOrGoodbye = (pLit "hello") `pAlt` (pLit "goodbye")
+
+pGreeting :: Parser (String, String)
+pGreeting = pThen mk_pair pHelloOrGoodbye pVar
+  where
+    mk_pair hg name = (hg, name)
+
+greetingStr :: String
+greetingStr = "goodbye James!"
+
+greetingP :: [((String, String), [Token])]
+greetingP = [ ( ( "goodbye", "James" ), [(0, "!")] ) ]

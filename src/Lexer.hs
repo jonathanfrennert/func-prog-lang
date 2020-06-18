@@ -1,4 +1,4 @@
-module Lexer ( clex, Token (..) ) where
+module Lexer where
 
 import Syntax
 
