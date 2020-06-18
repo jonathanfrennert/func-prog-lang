@@ -31,12 +31,12 @@ clex (c:cs) n
 
   | isAlpha c =
     let
-      var_tok = c : takeWhile isIdChar cs
-      rest_cs = dropWhile isIdChar cs
+      var_tok = c : takeWhile isVarChar cs
+      rest_cs = dropWhile isVarChar cs
     in
       (n, var_tok) : clex rest_cs n
 
   | otherwise = (n, [c]) : clex cs n
 
-isIdChar :: Char -> Bool
-isIdChar c = isAlpha c || isDigit c || (c == '_')
+isVarChar :: Char -> Bool
+isVarChar c = isAlpha c || isDigit c || (c == '_')
