@@ -8,18 +8,26 @@ import Test.QuickCheck
 
 parserTests :: IO ()
 parserTests = hspec $ do
-  describe "clex" $ do
-    it "can identify digits, variables and exclude whitespaces." $ do
-      (clex ex1Str 0) `shouldBe` ex1
+  describe "Lexer" $ do
+    describe "clex" $ do
+      it "can identify digits, variables and exclude whitespaces." $ do
+        (clex ex1Str 0) `shouldBe` ex1
 
-    it "can ignore comments." $ do
-      (clex comStr 0) `shouldBe` comToks
+      it "can ignore comments." $ do
+        (clex comStr 0) `shouldBe` comToks
 
-    it "can identify two-char operations." $ do
-      (clex eqStr 0) `shouldBe` eqToks
+      it "can identify two-char operations." $ do
+        (clex eqStr 0) `shouldBe` eqToks
 
-    it "can parse simple greeting BNF." $ do
-      (pGreeting $ clex greetingStr 0) `shouldBe` greetingP
+  describe "ParserType" $ do
+    describe "pThen" $ do
+      it "can partially parse a BNF greeting." $ do
+        (pGreeting $ clex greetingStr 0) `shouldBe` greetingP
+
+    describe "pThen3" $ do
+      it "can completely parse a BNF greeting." $ do
+        (pGreeting3 $ clex greetingStr 0) `shouldBe` greetingP3
+
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -45,7 +53,7 @@ eqStr = "123ab  ==c_de"
 eqToks :: [Token]
 eqToks = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
 
--- | Check if the parsing can handle greetings (basic BNF) (1.6.2).
+-- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2).
 
 pHelloOrGoodbye :: Parser String
 pHelloOrGoodbye = (pLit "hello") `pAlt` (pLit "goodbye")
@@ -60,3 +68,13 @@ greetingStr = "goodbye James!"
 
 greetingP :: [((String, String), [Token])]
 greetingP = [ ( ( "goodbye", "James" ), [(0, "!")] ) ]
+
+-- | Check if 'pThen3' can parse a greeting (basic BNF) (1.6.3).
+
+pGreeting3 :: Parser (String, String)
+pGreeting3 = pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
+    where
+      mk_greeting hg name exclamation = (hg, name)
+
+greetingP3 :: [((String, String), [Token])]
+greetingP3 = [ ( ( "goodbye", "James" ), [] ) ]
