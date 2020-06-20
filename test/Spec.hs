@@ -1,6 +1,6 @@
 import PPrintTests
-import ParserTests
+import ParseTests
 
 main :: IO ()
 main = do pprTests
-          parserTests
+          parseTests

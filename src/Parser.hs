@@ -39,9 +39,26 @@ pThen3 combine p1 p2 p3 toks
                                 , (v2, toks2) <- p2 toks1
                                 , (v3, toks3) <- p3 toks2 ]
 
+pThen4 :: (a -> b -> c -> d -> e) -> Parser a -> Parser b -> Parser c -> Parser d -> Parser e
+pThen4 combine p1 p2 p3 p4 toks
+  = [ (combine v1 v2 v3 v4, toks4) | (v1, toks1) <- p1 toks
+                                   , (v2, toks2) <- p2 toks1
+                                   , (v3, toks3) <- p3 toks2
+                                   , (v4, toks4) <- p4 toks3 ]
+
+-- | Identity parser
+pEmpty :: a -> Parser a
+pEmpty tok toks = [(tok, toks)]
+
+pZeroOrMore :: Parser a -> Parser [a]
+pZeroOrMore p = (pOneOrMore p) `pAlt` (pEmpty [])
+
+pOneOrMore :: Parser a -> Parser [a]
+pOneOrMore p = pThen (:) p (pZeroOrMore p)
+
 parse :: String -> CoreProgram
 parse = syntax.(flip clex $ 0).read
 
--- | Rewrite a list of tokens as a core program.
+-- | Rewrite a list of tokens as a core program
 syntax :: [Token] -> CoreProgram
 syntax = undefined

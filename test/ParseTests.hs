@@ -1,4 +1,4 @@
-module ParserTests (parserTests) where
+module ParseTests (parseTests) where
 
 import Lexer
 import Parser
@@ -6,8 +6,8 @@ import Parser
 import Test.Hspec
 import Test.QuickCheck
 
-parserTests :: IO ()
-parserTests = hspec $ do
+parseTests :: IO ()
+parseTests = hspec $ do
   describe "Lexer" $ do
     describe "clex" $ do
       it "can identify digits, variables and exclude whitespaces." $ do
@@ -28,6 +28,14 @@ parserTests = hspec $ do
       it "can completely parse a BNF greeting." $ do
         (pGreeting3 $ clex greetingStr 0) `shouldBe` greetingP3
 
+    describe "pZeroOrMore" $ do
+      it "can use a greeting BNF to parse zero or more greetings." $ do
+        (pGreetingNo $ clex noGreetingStr 0) `shouldBe` noGreetingP
+        (pGreetingNo $ clex greetingStr 0) `shouldBe` oneGreetingP
+
+    describe "pOneOrMore" $ do
+      it "can use a greeting BNF to parse multiple greetings." $ do
+        (pGreetingMult $ clex multGreetingStr 0) `shouldBe` multGreetingP
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -53,7 +61,7 @@ eqStr = "123ab  ==c_de"
 eqToks :: [Token]
 eqToks = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
 
--- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2).
+-- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2)
 
 pHelloOrGoodbye :: Parser String
 pHelloOrGoodbye = (pLit "hello") `pAlt` (pLit "goodbye")
@@ -66,15 +74,44 @@ pGreeting = pThen mk_pair pHelloOrGoodbye pVar
 greetingStr :: String
 greetingStr = "goodbye James!"
 
-greetingP :: [((String, String), [Token])]
+greetingP :: [ ( ( String, String ), [ Token ] ) ]
 greetingP = [ ( ( "goodbye", "James" ), [(0, "!")] ) ]
 
--- | Check if 'pThen3' can parse a greeting (basic BNF) (1.6.3).
+-- | Check if 'pThen3' can parse a greeting (basic BNF) (1.6.3)
 
 pGreeting3 :: Parser (String, String)
 pGreeting3 = pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
     where
       mk_greeting hg name exclamation = (hg, name)
 
-greetingP3 :: [((String, String), [Token])]
+greetingP3 :: [ ( ( String, String ), [ Token ] ) ]
 greetingP3 = [ ( ( "goodbye", "James" ), [] ) ]
+
+-- | Check if 'pZeroOrMore' can parse a greeting BNF with no greeting (EX 1.13)
+
+noGreetingStr :: String
+noGreetingStr = " "
+
+pGreetingNo :: Parser [(String, String)]
+pGreetingNo = pZeroOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
+    where
+      mk_greeting hg name exclamation = (hg, name)
+
+noGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
+noGreetingP = [ ( [], [] ) ]
+
+oneGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
+oneGreetingP = [ ( [( "goodbye", "James" )], [] ), ( [], [(0,"goodbye"), (0,"James"), (0,"!")] ) ]
+
+-- | Check if 'p'pOneOrMore' can parse a greeting BNF with multiple greetings (EX 1.13)
+
+multGreetingStr :: String
+multGreetingStr = "goodbye James! hello Jerry!"
+
+pGreetingMult :: Parser [(String, String)]
+pGreetingMult = pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
+    where
+      mk_greeting hg name exclamation = (hg, name)
+
+multGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
+multGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
