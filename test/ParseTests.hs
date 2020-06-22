@@ -29,17 +29,22 @@ parseTests = hspec $ do
         (pGreeting3 $ clex greetingStr 0) `shouldBe` greetingP3
 
     describe "pZeroOrMore" $ do
-      it "can use a greeting BNF to parse zero or more greetings." $ do
+      it "can parse zero or more tokens." $ do
         (pGreetingNo $ clex noGreetingStr 0) `shouldBe` noGreetingP
         (pGreetingNo $ clex greetingStr 0) `shouldBe` oneGreetingP
 
     describe "pOneOrMore" $ do
-      it "can use a greeting BNF to parse multiple greetings." $ do
+      it "can parse multiple tokens." $ do
         (pGreetingMult $ clex multGreetingStr 0) `shouldBe` multGreetingP
 
     describe "pApply" $ do
-      it "can apply a function to the results of the parse." $ do
+      it "can apply a function to the results of a parse." $ do
         (pGreetingN $ clex multGreetingStr 0) `shouldBe` nGreetingP
+
+    describe "pOneOrMoreWithSep" $ do
+      it "can parse one or more seperated greetings." $ do
+        (pGreetingSep $ clex sepGreetingStr 0) `shouldBe` sepGreetingP
+
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -129,3 +134,16 @@ pGreetingN = ( pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!") )
 
 nGreetingP :: [ ( Int, [Token] ) ]
 nGreetingP = [ (2, []), (1, [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+
+-- | Check if 'pOneOrMoreWithSep' can parse a multiple greetings seperated by semicolons (EX 1.15).
+
+sepGreetingStr :: String
+sepGreetingStr = "goodbye James!; hello Jerry!"
+
+pGreetingSep :: Parser [(String, String)]
+pGreetingSep = pOneOrMoreWithSep (pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")) (pLit ";")
+    where
+      mk_greeting hg name exclamation = (hg, name)
+
+sepGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
+sepGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,";"),(0,"hello"),(0,"Jerry"),(0,"!")]) ]

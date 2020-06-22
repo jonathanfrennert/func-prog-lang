@@ -8,10 +8,10 @@ import Data.Char
 type Parser a = [Token] -> [(a, [Token])]
 
 pSat :: (String -> Bool) -> Parser String
+pSat _ [] = []
 pSat f ( (_, tok ) : toks )
   | f tok     = [(tok, toks)]
   | otherwise = []
-pSat _ [] = []
 
 pLit :: String -> Parser String
 pLit s = pSat (s ==)
@@ -55,6 +55,14 @@ pZeroOrMore p = (pOneOrMore p) `pAlt` (pEmpty [])
 
 pOneOrMore :: Parser a -> Parser [a]
 pOneOrMore p = pThen (:) p (pZeroOrMore p)
+
+pOneOrMoreWithSep :: Parser a -> Parser b -> Parser [a]
+pOneOrMoreWithSep p pSep = pThen (:)  p (pOneOrMoreWithSep' p pSep)
+
+pOneOrMoreWithSep' :: Parser a -> Parser b -> Parser [a]
+pOneOrMoreWithSep' p pSep = (pThen snd' pSep ( pOneOrMoreWithSep p pSep ) )
+  `pAlt` (pEmpty [])
+  where snd' = curry snd
 
 pApply :: Parser a -> (a -> b) -> Parser b
 pApply p f toks = [ (f v1, toks1) | (v1, toks1)  <- p toks  ]
