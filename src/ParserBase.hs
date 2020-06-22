@@ -1,4 +1,4 @@
-module Parser where
+module ParserBase where
 
 import Syntax
 import Lexer
@@ -55,6 +55,9 @@ pZeroOrMore p = (pOneOrMore p) `pAlt` (pEmpty [])
 
 pOneOrMore :: Parser a -> Parser [a]
 pOneOrMore p = pThen (:) p (pZeroOrMore p)
+
+pApply :: Parser a -> (a -> b) -> Parser b
+pApply p f toks = [ (f v1, toks1) | (v1, toks1)  <- p toks  ]
 
 parse :: String -> CoreProgram
 parse = syntax.(flip clex $ 0).read

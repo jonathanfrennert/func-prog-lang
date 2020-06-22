@@ -1,7 +1,7 @@
 module ParseTests (parseTests) where
 
 import Lexer
-import Parser
+import ParserBase
 
 import Test.Hspec
 import Test.QuickCheck
@@ -19,7 +19,7 @@ parseTests = hspec $ do
       it "can identify two-char operations." $ do
         (clex eqStr 0) `shouldBe` eqToks
 
-  describe "ParserType" $ do
+  describe "ParserBase" $ do
     describe "pThen" $ do
       it "can partially parse a BNF greeting." $ do
         (pGreeting $ clex greetingStr 0) `shouldBe` greetingP
@@ -36,6 +36,10 @@ parseTests = hspec $ do
     describe "pOneOrMore" $ do
       it "can use a greeting BNF to parse multiple greetings." $ do
         (pGreetingMult $ clex multGreetingStr 0) `shouldBe` multGreetingP
+
+    describe "pApply" $ do
+      it "can apply a function to the results of the parse." $ do
+        (pGreetingN $ clex multGreetingStr 0) `shouldBe` nGreetingP
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -103,7 +107,7 @@ noGreetingP = [ ( [], [] ) ]
 oneGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
 oneGreetingP = [ ( [( "goodbye", "James" )], [] ), ( [], [(0,"goodbye"), (0,"James"), (0,"!")] ) ]
 
--- | Check if 'p'pOneOrMore' can parse a greeting BNF with multiple greetings (EX 1.13)
+-- | Check if 'pOneOrMore' can parse a greeting BNF with multiple greetings (EX 1.13)
 
 multGreetingStr :: String
 multGreetingStr = "goodbye James! hello Jerry!"
@@ -115,3 +119,13 @@ pGreetingMult = pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
 
 multGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
 multGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+
+-- | Check if 'pApply' can count number of greetings in a greeting BNF with multiple greetings (EX 1.14)
+
+pGreetingN :: Parser Int
+pGreetingN = ( pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!") ) `pApply` length
+    where
+      mk_greeting hg name exclamation = (hg, name)
+
+nGreetingP :: [ ( Int, [Token] ) ]
+nGreetingP = [ (2, []), (1, [(0,"hello"),(0,"Jerry"),(0,"!")]) ]

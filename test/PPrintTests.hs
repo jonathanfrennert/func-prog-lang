@@ -2,26 +2,27 @@ module PPrintTests(pprTests) where
 
 import Syntax
 import PPrint
-import PPrintType
+import PPrintBase
 
 import Test.Hspec
 import Test.QuickCheck
 
 pprTests :: IO ()
 pprTests = hspec $ do
-  describe "pprExpr" $ do
-    it "has a linear time complexity." $ property $
-      propTimeComplexity
+  describe "PPrint" $ do
+    describe "pprExpr" $ do
+      it "has a linear time complexity." $ property $
+        propTimeComplexity
 
-    it "can print 'ELet' layout." $ do
-      (pprCore letLayoutExample) `shouldBe` letLayoutStr
+      it "can print 'ELet' layout." $ do
+        (pprCore letLayoutExample) `shouldBe` letLayoutStr
 
-    it "can print 'EVar' with newline." $ do
-      (pprCore newLineExpr) `shouldBe` newLineStr
+      it "can print 'EVar' with newline." $ do
+        (pprCore newLineExpr) `shouldBe` newLineStr
 
-    it "can account for operator precedence." $ do
-      (pprCore precExpr) `shouldBe` precStr
-      (pprCore boolExpr) `shouldBe` boolStr
+      it "can account for operator precedence." $ do
+        (pprCore precExpr) `shouldBe` precStr
+        (pprCore boolExpr) `shouldBe` boolStr
 
 pprCore :: CoreExpr -> String
 pprCore = iDisplay.(flip pprExpr $ noPrec)

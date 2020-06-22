@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2e08d023240fa3ea05001867a1453d6bc5729c5dfa0d1bdeb2e418e69694947f
+-- hash: a56d687098c0ec55e43176ea640f5f167591db8f7e0aa8081b7cbef69cbaf19a
 
 name:           chi
 version:        0.1.0.0
@@ -28,9 +28,9 @@ source-repository head
 library
   exposed-modules:
       Lexer
-      Parser
+      ParserBase
       PPrint
-      PPrintType
+      PPrintBase
       StdPrelude
       Syntax
       Utils

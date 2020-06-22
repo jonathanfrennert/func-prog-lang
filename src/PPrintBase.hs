@@ -1,4 +1,4 @@
-module PPrintType where
+module PPrintBase where
 
 import Utils
 
