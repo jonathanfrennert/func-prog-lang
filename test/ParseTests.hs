@@ -114,7 +114,7 @@ noGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
 noGreetingP = [ ( [], [] ) ]
 
 oneGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
-oneGreetingP = [ ( [( "goodbye", "James" )], [] ), ( [], [(0,"goodbye"), (0,"James"), (0,"!")] ) ]
+oneGreetingP = [ ( [( "goodbye", "James" )], [] ) ]
 
 -- | Check if 'pOneOrMore' can parse a greeting BNF with multiple greetings (EX 1.13)
 
@@ -127,7 +127,7 @@ pGreetingMult = pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!")
       mk_greeting hg name exclamation = (hg, name)
 
 multGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
-multGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+multGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []) ]
 
 -- | Check if 'pApply' can count number of greetings in a greeting BNF with multiple greetings (EX 1.14)
 
@@ -137,7 +137,7 @@ pGreetingN = ( pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!") )
       mk_greeting hg name exclamation = (hg, name)
 
 nGreetingP :: [ ( Int, [Token] ) ]
-nGreetingP = [ (2, []), (1, [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+nGreetingP = [ (2, []) ]
 
 -- | Check if 'pOneOrMoreWithSep' can parse a multiple greetings seperated by semicolons (EX 1.15)
 
@@ -150,7 +150,7 @@ pGreetingSep = pOneOrMoreWithSep (pThen3 mk_greeting pHelloOrGoodbye pVar (pLit 
       mk_greeting hg name exclamation = (hg, name)
 
 sepGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
-sepGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,";"),(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+sepGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []) ]
 
 -- | Check if 'pNum' can parse a number (EX 1.18)
 

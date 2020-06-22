@@ -2,6 +2,7 @@ module ParserBase where
 
 import Syntax
 import Lexer
+import Utils
 
 import Data.Char
 
@@ -26,7 +27,7 @@ pVar = pSat isVar
             && ( isAlpha.head $ s )
 
 pNum :: Parser Int
-pNum = pSat (and.map (isDigit)) `pApply` read 
+pNum = pSat (and.map (isDigit)) `pApply` read
 
 pAlt :: Parser a -> Parser a -> Parser a
 pAlt p1 p2 toks = (p1 toks) ++ (p2 toks)
@@ -54,25 +55,35 @@ pEmpty :: a -> Parser a
 pEmpty tok toks = [(tok, toks)]
 
 pZeroOrMore :: Parser a -> Parser [a]
-pZeroOrMore p = (pOneOrMore p) `pAlt` (pEmpty [])
+pZeroOrMore p = pFst $ (pOneOrMore p) `pAlt` (pEmpty [])
 
 pOneOrMore :: Parser a -> Parser [a]
-pOneOrMore p = pThen (:) p (pZeroOrMore p)
+pOneOrMore p = pFst $ pThen (:) p (pZeroOrMore p)
 
 pOneOrMoreWithSep :: Parser a -> Parser b -> Parser [a]
-pOneOrMoreWithSep p pSep = pThen (:)  p (pOneOrMoreWithSep' p pSep)
+pOneOrMoreWithSep p pSep = pFst $ pThen (:)  p (pOneOrMoreWithSep' p pSep)
 
 pOneOrMoreWithSep' :: Parser a -> Parser b -> Parser [a]
-pOneOrMoreWithSep' p pSep = (pThen snd' pSep ( pOneOrMoreWithSep p pSep ) )
+pOneOrMoreWithSep' p pSep = pFst $ (pThen snd' pSep ( pOneOrMoreWithSep p pSep ) )
   `pAlt` (pEmpty [])
   where snd' = curry snd
 
+-- | Apply a function to parse results
 pApply :: Parser a -> (a -> b) -> Parser b
 pApply p f toks = [ (f v1, toks1) | (v1, toks1)  <- p toks  ]
 
 parse :: String -> CoreProgram
 parse = syntax.(flip clex $ 0).read
 
+-- | Only the left-most parse result is relevant (optimisation)
+pFst :: Parser a -> Parser a
+pFst p = head'.p
+
 -- | Rewrite a list of tokens as a core program
 syntax :: [Token] -> CoreProgram
 syntax = undefined
+
+-- | Performance test of 'pOneorMore'
+
+pOneOrMoreN :: Int -> [([String], [Token])]
+pOneOrMoreN n = pOneOrMore (pLit "x") (take n $ zip (repeat 0) (repeat "x"))
