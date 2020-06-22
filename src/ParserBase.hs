@@ -25,6 +25,9 @@ pVar = pSat isVar
     isVar s = s `notElem` keywords
             && ( isAlpha.head $ s )
 
+pNum :: Parser Int
+pNum = pSat (and.map (isDigit)) `pApply` read 
+
 pAlt :: Parser a -> Parser a -> Parser a
 pAlt p1 p2 toks = (p1 toks) ++ (p2 toks)
 

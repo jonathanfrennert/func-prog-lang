@@ -45,6 +45,10 @@ parseTests = hspec $ do
       it "can parse one or more seperated greetings." $ do
         (pGreetingSep $ clex sepGreetingStr 0) `shouldBe` sepGreetingP
 
+    describe "pNum" $ do
+      it "can parse numbers." $ do
+        (pNum $ clex numStr 0) `shouldBe` numP
+
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -135,7 +139,7 @@ pGreetingN = ( pOneOrMore $ pThen3 mk_greeting pHelloOrGoodbye pVar (pLit "!") )
 nGreetingP :: [ ( Int, [Token] ) ]
 nGreetingP = [ (2, []), (1, [(0,"hello"),(0,"Jerry"),(0,"!")]) ]
 
--- | Check if 'pOneOrMoreWithSep' can parse a multiple greetings seperated by semicolons (EX 1.15).
+-- | Check if 'pOneOrMoreWithSep' can parse a multiple greetings seperated by semicolons (EX 1.15)
 
 sepGreetingStr :: String
 sepGreetingStr = "goodbye James!; hello Jerry!"
@@ -147,3 +151,11 @@ pGreetingSep = pOneOrMoreWithSep (pThen3 mk_greeting pHelloOrGoodbye pVar (pLit 
 
 sepGreetingP :: [ ( [ ( String, String ) ], [Token] ) ]
 sepGreetingP = [ ([("goodbye","James"),("hello","Jerry")], []), ([("goodbye","James")], [(0,";"),(0,"hello"),(0,"Jerry"),(0,"!")]) ]
+
+-- | Check if 'pNum' can parse a number (EX 1.18)
+
+numStr :: String
+numStr = " 11232323"
+
+numP :: [ ( Int, [ Token ] ) ]
+numP = [ (11232323, []) ]
