@@ -2,7 +2,6 @@ module ParserBase where
 
 import Syntax
 import Lexer
-import Utils
 
 import Data.Char
 
@@ -31,6 +30,10 @@ pNum = pSat (and.map (isDigit)) `pApply` read
 
 pAlt :: Parser a -> Parser a -> Parser a
 pAlt p1 p2 toks = (p1 toks) ++ (p2 toks)
+
+-- | Apply a function to parse results
+pApply :: Parser a -> (a -> b) -> Parser b
+pApply p f toks = [ (f v1, toks1) | (v1, toks1)  <- p toks  ]
 
 pThen :: (a -> b -> c) -> Parser a -> Parser b -> Parser c
 pThen combine p1 p2 toks
@@ -68,22 +71,9 @@ pOneOrMoreWithSep' p pSep = pFst $ (pThen snd' pSep ( pOneOrMoreWithSep p pSep )
   `pAlt` (pEmpty [])
   where snd' = curry snd
 
--- | Apply a function to parse results
-pApply :: Parser a -> (a -> b) -> Parser b
-pApply p f toks = [ (f v1, toks1) | (v1, toks1)  <- p toks  ]
-
-parse :: String -> CoreProgram
-parse = syntax.(flip clex $ 0).read
-
 -- | Only the left-most parse result is relevant (optimisation)
 pFst :: Parser a -> Parser a
 pFst p = head'.p
-
--- | Rewrite a list of tokens as a core program
-syntax :: [Token] -> CoreProgram
-syntax = undefined
-
--- | Performance test of 'pOneorMore'
-
-pOneOrMoreN :: Int -> [([String], [Token])]
-pOneOrMoreN n = pOneOrMore (pLit "x") (take n $ zip (repeat 0) (repeat "x"))
+  where
+    head' (x:xs) = [x]
+    head' x      = x

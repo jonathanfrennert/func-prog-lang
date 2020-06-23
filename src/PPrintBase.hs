@@ -1,7 +1,5 @@
 module PPrintBase where
 
-import Utils
-
 data Iseq = INil
           | IStr String
           | IAppend Iseq Iseq
@@ -83,3 +81,6 @@ iInterleave :: Iseq -> [Iseq] -> Iseq
 iInterleave _ []         = iNil
 iInterleave _ [iseq]     = iseq
 iInterleave sep (iq:iqs) = iConcat [iq, sep, iInterleave sep iqs]
+
+space :: Int -> String
+space n = take n (repeat ' ')
