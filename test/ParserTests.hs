@@ -49,6 +49,8 @@ parserTests = hspec $ do
     describe "pExpr" $ do
       it "can parse application expressions." $ do
         (parse appStr) `shouldBe` appProg
+      it "can parse infix operations." $ do
+        (parse infixStr) `shouldBe` infixProg
 
 -- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2)
 
@@ -142,7 +144,8 @@ progStr :: String
 progStr = "f = 3 ;\ng x y = let z = x in z ;\nh x = case (let y = x in y) of\n  <1> -> 2 ;\n  <2> -> 5"
 
 coreProg :: CoreProgram
-coreProg = [("f",[],ENum 3),("g",["x","y"],ELet False [("z",EVar "x")] (EVar "z")),("h",["x"],ECase (ELet False [("y",EVar "x")] (EVar "y")) [(1,[],ENum 2),(2,[],ENum 5)])]
+coreProg = [("f",[],ENum 3),("g",["x","y"],ELet False [("z",EVar "x")] (EVar "z"))
+           ,("h",["x"],ECase (ELet False [("y",EVar "x")] (EVar "y")) [(1,[],ENum 2),(2,[],ENum 5)])]
 
 -- | Check parser choice in "dangling else" problem (EX 1.22)
 
@@ -159,3 +162,16 @@ appStr = "f x = 3 ;\n d = f (c x)"
 
 appProg :: CoreProgram
 appProg = [("f",["x"],ENum 3),("d",[],EAp (EVar "f") (EAp (EVar "c") (EVar "x")))]
+
+-- | Check if the parser can handle infix operations (EX 1.24)
+
+infixStr :: String
+infixStr = "f x = x + 2 * 2 / x - 7 > 9 * 10\n"
+
+infixProg :: CoreProgram
+infixProg =  [("f",["x"],EAp (EAp (EVar ">")
+              (EAp (EAp (EVar "+") (EVar "x"))
+              (EAp (EAp (EVar "-")
+              (EAp (EAp (EVar "*") (ENum 2))
+              (EAp (EAp (EVar "/") (ENum 2)) (EVar "x")))) (ENum 7))))
+              (EAp (EAp (EVar "*") (ENum 9)) (ENum 10)))]

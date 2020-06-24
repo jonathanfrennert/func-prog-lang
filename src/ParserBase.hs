@@ -25,6 +25,12 @@ pVar = pSat isVar
     isVar s = s `notElem` keywords
             && ( isAlpha.head $ s )
 
+relops :: [String]
+relops = ["<", "<=", "==", "~=", ">=", ">"]
+
+pRelop :: Parser String
+pRelop = pSat (`elem` relops)
+
 pNum :: Parser Int
 pNum = pSat (and.map (isDigit)) `pApply` read
 

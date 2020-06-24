@@ -23,15 +23,9 @@ pSc = pThen4 mk_sc pVar pArgs (pLit "=") pExpr
     mk_sc sc args _ rhs = (sc, args, rhs)
 
 pExpr :: Parser CoreExpr
-pExpr = pAlt pApp
-      $ pAlt pLet
+pExpr = pAlt pLet
       $ pAlt pCase
-      $ pAlt pLambda pAtomic
-
-pApp :: Parser CoreExpr
-pApp = (pOneOrMore pAtomic) `pApply` mk_app_chain
-  where
-    mk_app_chain (fx:xs) = foldl EAp fx xs
+      $ pAlt pLambda pExpr1
 
 pLet :: Parser CoreExpr
 pLet = pThen4 mk_let
@@ -51,9 +45,9 @@ pLambda = pThen4 mk_lam (pLit "\\")  pArgs (pLit ".") pExpr
     mk_lam _ args _ e = ELam args e
 
 pAtomic :: Parser CoreExpr
-pAtomic = pAlt (pVar `pApply` EVar)
-        $ pAlt (pNum `pApply` ENum)
-        $ pAlt pConstr pBrackExpr
+pAtomic = pAlt pConstr
+        $ pAlt pBracExpr
+        $ pAlt (pVar `pApply` EVar) (pNum `pApply` ENum)
 
 pConstr :: Parser CoreExpr
 pConstr = pThen4 pick_constr (pLit "Cons") (pLit "{") pTagArity (pLit "}")
@@ -62,10 +56,10 @@ pConstr = pThen4 pick_constr (pLit "Cons") (pLit "{") pTagArity (pLit "}")
     pTagArity                  = pThen3 mk_constr pNum (pLit ",") pNum
     mk_constr tag _ arity      = EConstr tag arity
 
-pBrackExpr :: Parser CoreExpr
-pBrackExpr = pThen3 mk_brack (pLit "(") pExpr (pLit ")")
+pBracExpr :: Parser CoreExpr
+pBracExpr = pThen3 mk_brac (pLit "(") pExpr (pLit ")")
   where
-    mk_brack _ e _ = e
+    mk_brac _ e _ = e
 
 pDefns :: Parser [CoreDefn]
 pDefns = pOneOrMoreWithSemicolon pDefn
@@ -90,3 +84,59 @@ pArgs = pZeroOrMore pVar
 
 pOneOrMoreWithSemicolon :: Parser a -> Parser [a]
 pOneOrMoreWithSemicolon p = pOneOrMoreWithSep p (pLit ";")
+
+-- | Infix operators & function application
+
+data PartialExpr = NoOp | FoundOp Name CoreExpr
+
+assembleOp :: CoreExpr -> PartialExpr -> CoreExpr
+assembleOp e NoOp             = e
+assembleOp e1 (FoundOp op e2) = EAp (EAp (EVar op) e1) e2
+
+
+-- | Booleans
+
+pExpr1 :: Parser CoreExpr
+pExpr1 = pThen assembleOp pExpr2 pExpr1Snd
+
+pExpr1Snd :: Parser PartialExpr
+pExpr1Snd = (pThen FoundOp (pLit "|") pExpr1) `pAlt` (pEmpty NoOp)
+
+pExpr2 :: Parser CoreExpr
+pExpr2 = pThen assembleOp pExpr3 pExpr2Snd
+
+pExpr2Snd :: Parser PartialExpr
+pExpr2Snd = (pThen FoundOp (pLit "&") pExpr2) `pAlt` (pEmpty NoOp)
+
+-- | Relations
+
+pExpr3 :: Parser CoreExpr
+pExpr3 = pThen assembleOp pExpr4 pExpr3Snd
+
+pExpr3Snd :: Parser PartialExpr
+pExpr3Snd = (pThen FoundOp pRelop pExpr4) `pAlt` (pEmpty NoOp)
+
+-- | Addition and subtraction
+
+pExpr4 :: Parser CoreExpr
+pExpr4 = pThen assembleOp pExpr5 pExpr4Snd
+
+pExpr4Snd :: Parser PartialExpr
+pExpr4Snd = pAlt (pThen FoundOp (pLit "+") pExpr4)
+          $ pAlt (pThen FoundOp (pLit "-") pExpr5) (pEmpty NoOp)
+
+-- | Multiplication and division
+
+pExpr5 :: Parser CoreExpr
+pExpr5 = pThen assembleOp pExpr6 pExpr5Snd
+
+pExpr5Snd :: Parser PartialExpr
+pExpr5Snd = pAlt (pThen FoundOp (pLit "*") pExpr5)
+          $ pAlt (pThen FoundOp (pLit "/") pExpr6) (pEmpty NoOp)
+
+-- Function application
+
+pExpr6 :: Parser CoreExpr
+pExpr6 = (pOneOrMore pAtomic) `pApply` mk_app_chain
+  where
+    mk_app_chain (fx:xs) = foldl EAp fx xs

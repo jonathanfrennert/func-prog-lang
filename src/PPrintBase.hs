@@ -50,11 +50,11 @@ iNum = iStr.show
 iSpace :: Iseq
 iSpace = iStr " "
 
-iBrackL :: Iseq
-iBrackL = iStr "("
+iBracL :: Iseq
+iBracL = iStr "("
 
-iBrackR :: Iseq
-iBrackR = iStr ")"
+iBracR :: Iseq
+iBracR = iStr ")"
 
 -- | List seperator
 iSep :: Iseq
