@@ -46,6 +46,10 @@ parserTests = hspec $ do
       it "parses 'dangling else' like the C language." $ do
         (parse dangStr) `shouldBe` dangProg
 
+    describe "pExpr" $ do
+      it "can parse application expressions." $ do
+        (parse appStr) `shouldBe` appProg
+
 -- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2)
 
 pHelloOrGoodbye :: Parser String
@@ -147,3 +151,11 @@ dangStr = "f x y = case x of\n<1> -> case y of\n  <1> -> 1;\n<2> -> 2"
 
 dangProg :: CoreProgram
 dangProg = [("f",["x","y"],ECase (EVar "x") [(1,[],ECase (EVar "y") [(1,[],ENum 1),(2,[],ENum 2)])])]
+
+-- | Check if the parser can handle application expressions (EX 1.23)
+
+appStr :: String
+appStr = "f x = 3 ;\n d = f (c x)"
+
+appProg :: CoreProgram
+appProg = [("f",["x"],ENum 3),("d",[],EAp (EVar "f") (EAp (EVar "c") (EVar "x")))]

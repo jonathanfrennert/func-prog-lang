@@ -23,9 +23,15 @@ pSc = pThen4 mk_sc pVar pArgs (pLit "=") pExpr
     mk_sc sc args _ rhs = (sc, args, rhs)
 
 pExpr :: Parser CoreExpr
-pExpr = pAlt pLet
+pExpr = pAlt pApp
+      $ pAlt pLet
       $ pAlt pCase
       $ pAlt pLambda pAtomic
+
+pApp :: Parser CoreExpr
+pApp = (pOneOrMore pAtomic) `pApply` mk_app_chain
+  where
+    mk_app_chain (fx:xs) = foldl EAp fx xs
 
 pLet :: Parser CoreExpr
 pLet = pThen4 mk_let
@@ -76,8 +82,8 @@ pAlter :: Parser CoreAlt
 pAlter = pThen4 mk_alt pTag pArgs (pLit "->") pExpr
   where
     mk_alt tag vars _ rhs = (tag, vars, rhs)
-    pTag                = pThen3 mk_tag (pLit "<") pNum (pLit ">")
-    mk_tag _ tag _      = tag
+    pTag                  = pThen3 mk_tag (pLit "<") pNum (pLit ">")
+    mk_tag _ tag _        = tag
 
 pArgs :: Parser [String]
 pArgs = pZeroOrMore pVar
