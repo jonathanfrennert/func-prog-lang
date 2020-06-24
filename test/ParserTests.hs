@@ -41,8 +41,10 @@ parserTests = hspec $ do
 
   describe "Parser" $ do
     describe "parse" $ do
-      it "can parse a simple Core language program" $ do
+      it "can parse a simple Core language program." $ do
         (parse progStr) `shouldBe` coreProg
+      it "parses 'dangling else' like the C language." $ do
+        (parse dangStr) `shouldBe` dangProg
 
 -- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2)
 
@@ -137,3 +139,11 @@ progStr = "f = 3 ;\ng x y = let z = x in z ;\nh x = case (let y = x in y) of\n  
 
 coreProg :: CoreProgram
 coreProg = [("f",[],ENum 3),("g",["x","y"],ELet False [("z",EVar "x")] (EVar "z")),("h",["x"],ECase (ELet False [("y",EVar "x")] (EVar "y")) [(1,[],ENum 2),(2,[],ENum 5)])]
+
+-- | Check parser choice in "dangling else" problem (EX 1.22)
+
+dangStr :: String
+dangStr = "f x y = case x of\n<1> -> case y of\n  <1> -> 1;\n<2> -> 2"
+
+dangProg :: CoreProgram
+dangProg = [("f",["x","y"],ECase (EVar "x") [(1,[],ECase (EVar "y") [(1,[],ENum 1),(2,[],ENum 2)])])]
