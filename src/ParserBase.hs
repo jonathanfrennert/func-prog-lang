@@ -25,9 +25,6 @@ pVar = pSat isVar
     isVar s = s `notElem` keywords
             && ( isAlpha.head $ s )
 
-pVars :: Parser [String]
-pVars = pZeroOrMore pVar
-
 pNum :: Parser Int
 pNum = pSat (and.map (isDigit)) `pApply` read
 

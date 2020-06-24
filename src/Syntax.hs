@@ -13,11 +13,11 @@ data Expr a
       (Expr a)                -- ^ Expression to scrutinise
       [Alter a]               -- ^ Alternatives
   | ELam [a] (Expr a)         -- ^ Lambda abstractions
-  deriving(Show)
+  deriving(Show, Eq)
 
 type Name = String
-
 type CoreExpr = Expr Name
+type CoreDefn = (Name, CoreExpr)
 
 type Alter a = (Int, [a], Expr a)
 type CoreAlt = Alter Name

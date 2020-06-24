@@ -31,79 +31,79 @@ pprExpr (EVar v) _ = iStr v
 pprExpr (ENum n) _ = iNum n
 
 pprExpr (EAp (EAp (EVar "*") e1) e2) n
-  | n > multPrec  = iConcat [ iParL, prod, iParR ]
+  | n > multPrec  = iConcat [ iBrackL, prod, iBrackR ]
   | otherwise     = prod
   where
     prod = iConcat [pprExpr e1 multPrec, iStr " * ", pprExpr e2 multPrec]
 
 pprExpr (EAp (EAp (EVar "/") e1) e2) n
-  | n > divPrec  = iConcat [ iParL, quot', iParR ]
+  | n > divPrec  = iConcat [ iBrackL, quot', iBrackR ]
   | otherwise     = quot'
   where
     quot' = iConcat [pprExpr e1 divPrec, iStr " / ", pprExpr e2 divPrec]
 
 pprExpr (EAp (EAp (EVar "+") e1) e2) n
-  | n > addPrec = iConcat [ iParL, add, iParR ]
+  | n > addPrec = iConcat [ iBrackL, add, iBrackR ]
   | otherwise   = add
   where
     add = iConcat [pprExpr e1 addPrec, iStr " + ", pprExpr e2 addPrec]
 
 pprExpr (EAp (EAp (EVar "-") e1) e2) n
-  | n > subPrec = iConcat [ iParL, sub, iParR ]
+  | n > subPrec = iConcat [ iBrackL, sub, iBrackR ]
   | otherwise   = sub
   where
     sub = iConcat [pprExpr e1 subPrec, iStr " - ", pprExpr e2 subPrec]
 
 pprExpr (EAp (EAp (EVar "==") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " == ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar "~=") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " ~= ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar ">") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " > ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar ">=") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " >= ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar "<") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " < ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar "<=") e1) e2) n
-  | n > eqPrec  = iConcat [iParL, eq, iParR]
+  | n > eqPrec  = iConcat [iBrackL, eq, iBrackR]
   | otherwise   = eq
   where
     eq = iConcat [pprExpr e1 eqPrec, iStr " <= ", pprExpr e2 eqPrec]
 
 pprExpr (EAp (EAp (EVar "&") e1) e2) n
-  | n > andPrec  = iConcat [iParL, and', iParR]
+  | n > andPrec  = iConcat [iBrackL, and', iBrackR]
   | otherwise   = and'
   where
     and' = iConcat [pprExpr e1 andPrec, iStr " & ", pprExpr e2 andPrec]
 
 pprExpr (EAp (EAp (EVar "|") e1) e2) n
-  | n > orPrec  = iConcat [iParL, and', iParR]
+  | n > orPrec  = iConcat [iBrackL, and', iBrackR]
   | otherwise   = and'
   where
     and' = iConcat [pprExpr e1 orPrec, iStr " | ", pprExpr e2 orPrec]
 
 pprExpr (EAp e1 e2) n
-  | n == appPrec  = iConcat [iParL, app, iParR]
+  | n == appPrec  = iConcat [iBrackL, app, iBrackR]
   | otherwise     = app
   where
     app = iConcat [pprExpr e1 noPrec, iSpace, pprExpr e2 appPrec]
@@ -123,7 +123,7 @@ pprExpr (ECase e alts) _          =
 
 pprExpr (ELam args body) _        =
   iConcat [ iStr "(\\", pprArgs args, iStr ". ", iIndent $ pprExpr body noPrec
-          , iParR ]
+          , iBrackR ]
 
 -- | Pretty print case alternatives
 pprAlt :: CoreAlt -> Iseq
@@ -131,10 +131,10 @@ pprAlt (tag, args, rhs) = iConcat [  iStr "<", iNum tag, iStr "> "
                                   ,  pprArgs args,  iStr " -> "
                                   ,  iIndent $ pprExpr rhs noPrec]
 
-pprDefns :: [(Name, CoreExpr)] -> Iseq
+pprDefns :: [CoreDefn] -> Iseq
 pprDefns defns = iInterleave iSep (map pprDefn defns)
 
-pprDefn :: (Name, CoreExpr) -> Iseq
+pprDefn :: CoreDefn -> Iseq
 pprDefn (name, e) = iConcat [ iStr name, iStr " = "
                             , iIndent (pprExpr e noPrec) ]
 

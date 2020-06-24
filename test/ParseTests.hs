@@ -2,6 +2,8 @@ module ParseTests (parseTests) where
 
 import Lexer
 import ParserBase
+import Parser
+import Syntax
 
 import Test.Hspec
 import Test.QuickCheck
@@ -49,6 +51,10 @@ parseTests = hspec $ do
       it "can parse numbers." $ do
         (pNum $ clex numStr 0) `shouldBe` numP
 
+  describe "Parser" $ do
+    describe "parse" $ do
+      it "can parse a simple Core language program" $ do
+        (parse progStr) `shouldBe` coreProg
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
@@ -159,3 +165,11 @@ numStr = " 11232323"
 
 numP :: [ ( Int, [ Token ] ) ]
 numP = [ (11232323, []) ]
+
+-- | Check if parser can handle a simple program (EX 1.21)
+
+progStr :: String
+progStr = "f = 3 ;\ng x y = let z = x in z ;\nh x = case (let y = x in y) of\n  <1> -> 2 ;\n  <2> -> 5"
+
+coreProg :: CoreProgram
+coreProg = [("f",[],ENum 3),("g",["x","y"],ELet False [("z",EVar "x")] (EVar "z")),("h",["x"],ECase (ELet False [("y",EVar "x")] (EVar "y")) [(1,[],ENum 2),(2,[],ENum 5)])]

@@ -15,7 +15,7 @@ flatten :: Int              -- ^ Current column; 0 for first column
         -> [(Iseq, Int)]    -- ^ Work list
         -> String
 flatten _ []                                   = ""
-flatten col ((INil, _) : iqs)                  = flatten col iqs
+flatten col ( (INil, _) : iqs)                 = flatten col iqs
 flatten col ( (IStr s, _) : iqs)               = s ++ (flatten (col + length s)  iqs)
 flatten col ( (IAppend iq1 iq2, indent) : iqs) = flatten col ( (iq1, indent) : (iq2, indent) : iqs)
 flatten col ( (IIndent iq, _) : iqs)           = flatten col ( (iq, col) : iqs)
@@ -50,11 +50,11 @@ iNum = iStr.show
 iSpace :: Iseq
 iSpace = iStr " "
 
-iParL :: Iseq
-iParL = iStr "("
+iBrackL :: Iseq
+iBrackL = iStr "("
 
-iParR :: Iseq
-iParR = iStr ")"
+iBrackR :: Iseq
+iBrackR = iStr ")"
 
 -- | List seperator
 iSep :: Iseq
