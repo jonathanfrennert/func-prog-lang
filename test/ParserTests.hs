@@ -1,26 +1,14 @@
-module ParseTests (parseTests) where
+module ParserTests (parserTests) where
 
-import Lexer
-import ParserBase
 import Parser
+import ParserBase
+import Lexer
 import Syntax
 
 import Test.Hspec
-import Test.QuickCheck
 
-parseTests :: IO ()
-parseTests = hspec $ do
-  describe "Lexer" $ do
-    describe "clex" $ do
-      it "can identify digits, variables and exclude whitespaces." $ do
-        (clex ex1Str 0) `shouldBe` ex1
-
-      it "can ignore comments." $ do
-        (clex comStr 0) `shouldBe` comToks
-
-      it "can identify two-char operations." $ do
-        (clex eqStr 0) `shouldBe` eqToks
-
+parserTests :: IO ()
+parserTests = hspec $ do
   describe "ParserBase" $ do
     describe "pThen" $ do
       it "can partially parse a BNF greeting." $ do
@@ -55,30 +43,6 @@ parseTests = hspec $ do
     describe "parse" $ do
       it "can parse a simple Core language program" $ do
         (parse progStr) `shouldBe` coreProg
-
--- | Check if lexer can digits, variables and spaces (1.6.1)
-
-ex1Str :: String
-ex1Str = "123ab  c_de"
-
-ex1 :: [Token]
-ex1 = [ (0, "123"), (0, "ab"), (0, "c_de") ]
-
--- | Check if the lexer can ignore comments and handle multiple lines (EX 1.9, 1.11).
-
-comStr :: String
-comStr = "123ab  -- HELLLOOOOOOO\nc_de"
-
-comToks :: [Token]
-comToks = [ (0 , "123"), (0, "ab"), (1, "c_de") ]
-
--- | Check if the lexer can identify 'twoCharOps' (EX 1.10)
-
-eqStr :: String
-eqStr = "123ab  ==c_de"
-
-eqToks :: [Token]
-eqToks = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
 
 -- | Check if the 'pThen' can partially parse a greeting (basic BNF) (1.6.2)
 

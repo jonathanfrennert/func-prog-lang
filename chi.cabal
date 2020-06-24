@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8b46904d085562ea7fa83680cdd26fb4079b69e3c3487e0af34b0e49977064f9
+-- hash: ab5ec39a5031d8db8efde031d7cbdffc273bbfbc65dbf3ccacaa041b55d7b370
 
 name:           chi
 version:        0.1.0.0
@@ -58,7 +58,8 @@ test-suite chi-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      ParseTests
+      LexerTests
+      ParserTests
       PPrintTests
       Paths_chi
   hs-source-dirs:

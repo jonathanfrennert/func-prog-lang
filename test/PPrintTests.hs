@@ -1,14 +1,14 @@
-module PPrintTests(pprTests) where
+module PPrintTests(pprintTests) where
 
-import Syntax
 import PPrint
 import PPrintBase
+import Syntax
 
 import Test.Hspec
 import Test.QuickCheck
 
-pprTests :: IO ()
-pprTests = hspec $ do
+pprintTests :: IO ()
+pprintTests = hspec $ do
   describe "PPrint" $ do
     describe "pprExpr" $ do
       it "has a linear time complexity." $ property $

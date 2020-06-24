@@ -1,6 +1,8 @@
+import LexerTests
 import PPrintTests
-import ParseTests
+import ParserTests
 
 main :: IO ()
-main = do pprTests
-          parseTests
+main = do lexerTests
+          pprintTests
+          parserTests
