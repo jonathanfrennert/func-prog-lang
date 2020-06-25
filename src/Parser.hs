@@ -10,9 +10,10 @@ parse = syntax.(flip clex $ 0)
 syntax :: [Token] -> CoreProgram
 syntax = fstP.pProgram
   where
-    fstP ( ( prog, [] ) : others ) = prog
-    fstP ( parse : others )        = fstP others
-    fstP _                         = error "Syntax error"
+    fstP []                          = error "Program is unparseable"
+    fstP [( _, ( (line, tok) : _) )] = error $ "Syntax error at line " ++ show line
+    fstP ( ( prog, [] ) : others )   = prog
+    fstP ( parse : others )          = fstP others
 
 pProgram :: Parser CoreProgram
 pProgram = pOneOrMoreWithSemicolon pSc
