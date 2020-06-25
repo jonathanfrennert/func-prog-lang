@@ -1,3 +1,7 @@
+<p align="left">
+ <img src="/doc/Chi.png" width="150" height="112.5" >
+</p>
+
 # Chi [![Build Status](https://travis-ci.com/J0HNN7G/chi.svg?token=ZvK25wQRVaBqu1vwJ2pP&branch=coreLang)](https://travis-ci.com/J0HNN7G/chi)
 
  Chi is functional programming language I am making to study functional programming language design and the Curry-Howard isomorphism. 
