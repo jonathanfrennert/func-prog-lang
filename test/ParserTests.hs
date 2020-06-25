@@ -6,6 +6,7 @@ import Lexer
 import Syntax
 
 import Test.Hspec
+import Control.Exception (evaluate)
 
 parserTests :: IO ()
 parserTests = hspec $ do
@@ -45,6 +46,10 @@ parserTests = hspec $ do
         (parse progStr) `shouldBe` coreProg
       it "parses 'dangling else' like the C language." $ do
         (parse dangStr) `shouldBe` dangProg
+      it "throws an error for non-Core language programs." $ do
+        evaluate (parse unparStr) `shouldThrow` errorCall "Program is unparseable"
+      it "throws an error for syntax errors." $ do
+        evaluate (parse syntaxStr) `shouldThrow` errorCall "Syntax error at line 2"
 
     describe "pExpr" $ do
       it "can parse application expressions." $ do
@@ -175,3 +180,13 @@ infixProg =  [("f",["x"],EAp (EAp (EVar ">")
               (EAp (EAp (EVar "*") (ENum 2))
               (EAp (EAp (EVar "/") (ENum 2)) (EVar "x")))) (ENum 7))))
               (EAp (EAp (EVar "*") (ENum 9)) (ENum 10)))]
+
+-- | Check if the parser can throw an exception for unparseable programs
+
+unparStr :: String
+unparStr = "unparseable :)\n f x = x + 2 * 2 / x - 7 > 9 * 10\n"
+
+-- | Check if the parser can throw an exception for a syntax error
+
+syntaxStr :: String
+syntaxStr = "f x y = case x of\n<1> -> case y of\n  <1> -> ent';\n<2> -> 2"

@@ -3,6 +3,6 @@ import PPrintTests
 import ParserTests
 
 main :: IO ()
-main = do lexerTests
-          pprintTests
+main = do pprintTests
+          lexerTests
           parserTests
