@@ -1,15 +1,38 @@
 module Template where
 
 import TemplateBase
-import Parser
 import Syntax
+import Parser
+import Heap
+import Assoc
+import StdPrelude
+import Utils
 
 runProg :: String -> String
 runProg = showResults.eval.compile.parse
 
 -- | produces the initial state of the template instantiation machine
 compile :: CoreProgram -> TiState
-compile = undefined
+compile prog =
+  (initial_stack, initialTiDump, initial_heap, globals, tiStatInitial)
+  where
+    sc_defs = prog ++ extraPreludeDefs
+
+    (initial_heap, globals) = buildInitialHeap sc_defs
+
+    initial_stack = [address_of_main]
+    address_of_main = aLookup globals "main" (error "main is not defined")
+
+extraPreludeDefs :: CoreProgram
+extraPreludeDefs = []
+
+buildInitialHeap :: CoreProgram -> (TiHeap, TiGlobals)
+buildInitialHeap = mapAccuml allocateSc hInitial
+
+allocateSc :: TiHeap -> CoreScDefn -> (TiHeap, (Name, Addr))
+allocateSc heap (name, args, body) = ( heap', (name, addr) )
+  where
+    (heap', addr) = hAlloc heap (NSupercomb name args body)
 
 -- | Perform repeated state transitions until a final state is reached
 eval :: TiState -> [TiState]

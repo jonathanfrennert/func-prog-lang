@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ab196bd1da08e93b83ea2ad5c1f344465da3187ac4432715abe51fc9b118cd3f
+-- hash: 562ce86bba5c59a009b34a573a958d64479a453f9ca49d151ed9d4b4873a7f2c
 
 name:           chi
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       Syntax
       Template
       TemplateBase
+      Utils
   other-modules:
       Paths_chi
   hs-source-dirs:
@@ -65,6 +66,7 @@ test-suite chi-test
       LexerTests
       ParserTests
       PPrintTests
+      TemplateTests
       Paths_chi
   hs-source-dirs:
       test

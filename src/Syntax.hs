@@ -33,14 +33,6 @@ type CoreProgram = Program Name
 type ScDefn a = (Name, [a], Expr a)
 type CoreScDefn = ScDefn Name
 
--- | Helper methods
-
-bindersOf :: [(a,b)] -> [a]
-bindersOf = map fst
-
-rhssOf :: [(a,b)] -> [b]
-rhssOf = map snd
-
 isAtomicExpr :: Expr a -> Bool
 isAtomicExpr (EVar _) = True
 isAtomicExpr (ENum _) = True

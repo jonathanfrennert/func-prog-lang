@@ -4,9 +4,11 @@ import Syntax
 import Heap
 import Assoc
 
+-- | Possible nodes in a heap
 data Node = NAp Addr Addr             -- ^ Application
   | NSupercomb Name [Name] CoreExpr   -- ^ Supercombinator
   | NNum Int                          -- ^ A number
+    deriving (Show, Eq)
 
 type TiState = (TiStack, TiDump, TiHeap, TiGlobals, TiStats)
 
@@ -14,6 +16,7 @@ type TiStack = [Addr]
 
 -- | Currently unused
 data TiDump = DummyTiDump
+  deriving (Show, Eq)
 
 initialTiDump :: TiDump
 initialTiDump = DummyTiDump
