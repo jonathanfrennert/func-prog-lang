@@ -2,11 +2,9 @@ module Heap where
 
 import Assoc
 
--- | Template instantiation heap.
-type Heap a = ( Int           -- ^ Number of objects
-              , [Addr]        -- ^ Unused Addresses
-              , ASSOC Addr a  -- ^ Association map of address to objects.
-              )
+-- | A heap holds the number of objects, unused addresses and
+-- an association map of address to objects
+type Heap a = ( Int, [Addr], ASSOC Addr a)
 
 type Addr = Int
 
