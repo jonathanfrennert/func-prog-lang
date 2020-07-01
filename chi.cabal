@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 562ce86bba5c59a009b34a573a958d64479a453f9ca49d151ed9d4b4873a7f2c
+-- hash: 54c15b47547eaa9fe40741506866e00f634aadce8ac95cf7f7d255e8364fa97d
 
 name:           chi
 version:        0.1.0.0
@@ -27,8 +27,6 @@ source-repository head
 
 library
   exposed-modules:
-      Assoc
-      Heap
       Lexer
       Parser
       ParserBase
@@ -38,7 +36,9 @@ library
       Syntax
       Template
       TemplateBase
-      Utils
+      Utils.Assoc
+      Utils.Data
+      Utils.Heap
   other-modules:
       Paths_chi
   hs-source-dirs:

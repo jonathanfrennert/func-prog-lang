@@ -3,10 +3,10 @@ module Template where
 import TemplateBase
 import Syntax
 import Parser
-import Heap
-import Assoc
 import StdPrelude
-import Utils
+import Utils.Heap
+import Utils.Assoc
+import Utils.Data
 
 runProg :: String -> String
 runProg = showResults.eval.compile.parse

@@ -1,6 +1,6 @@
-module Heap where
+module Utils.Heap where
 
-import Assoc
+import Utils.Assoc
 
 -- | A heap holds the number of objects, unused addresses and
 -- an association map of address to objects

@@ -1,4 +1,4 @@
-module Utils where
+module Utils.Data where
 
 -- | Apply a function to an accumulator and a list of elements
 -- to accumulate elements and return a result list of the elements

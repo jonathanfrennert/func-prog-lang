@@ -1,8 +1,8 @@
 module TemplateBase where
 
 import Syntax
-import Heap
-import Assoc
+import Utils.Heap
+import Utils.Assoc
 
 -- | Possible nodes in a heap
 data Node = NAp Addr Addr             -- ^ Application

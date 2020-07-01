@@ -3,7 +3,7 @@ module TemplateTests (templateTests) where
 import Template
 import TemplateBase
 import Syntax
-import Heap
+import Utils.Heap
 
 import Test.Hspec
 

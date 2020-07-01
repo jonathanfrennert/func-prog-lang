@@ -1,7 +1,7 @@
 module PPrint where
 
-import Syntax
 import PPrintBase
+import Syntax
 
 -- | Operator precedence
 appPrec, multPrec, divPrec, addPrec, subPrec, eqPrec, andPrec, orPrec, noPrec :: Int

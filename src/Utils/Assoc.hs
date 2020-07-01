@@ -1,4 +1,4 @@
-module Assoc where
+module Utils.Assoc where
 
 type ASSOC a b = [(a,b)]
 
