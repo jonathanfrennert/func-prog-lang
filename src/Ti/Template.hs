@@ -16,7 +16,7 @@ compile :: CoreProgram -> TiState
 compile prog =
   (initial_stack, initialTiDump, initial_heap, globals, tiStatInitial)
   where
-    sc_defs = prog ++ extraPreludeDefs
+    sc_defs = prog ++ preludeDefs ++ extraPreludeDefs
 
     (initial_heap, globals) = buildInitialHeap sc_defs
 

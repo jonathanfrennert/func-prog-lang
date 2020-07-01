@@ -8,7 +8,7 @@ mapAccuml :: (a -> b -> (a, c))   -- ^ Function of accumulator and element which
           -> [b]                  -- ^ Input list
           -> (a, [c])
 mapAccuml f acc []     = (acc, [])
-mapAccuml f acc [x]   = (acc', [y])
+mapAccuml f acc [x]    = (acc', [y])
   where
     (acc', y) = f acc x
 mapAccuml f acc (x:xs) = (acc2, y:ys)
