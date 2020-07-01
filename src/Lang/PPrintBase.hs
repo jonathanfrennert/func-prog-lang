@@ -1,4 +1,4 @@
-module PPrintBase where
+module Lang.PPrintBase where
 
 data Iseq = INil
           | IStr String

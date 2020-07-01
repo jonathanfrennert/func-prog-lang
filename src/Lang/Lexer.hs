@@ -1,6 +1,6 @@
-module Lexer where
+module Lang.Lexer where
 
-import Syntax
+import Lang.Syntax
 
 import Data.Char
 import Data.List

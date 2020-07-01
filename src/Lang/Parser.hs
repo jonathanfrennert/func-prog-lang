@@ -1,8 +1,8 @@
-module Parser where
+module Lang.Parser where
 
-import ParserBase
-import Syntax
-import Lexer
+import Lang.ParserBase
+import Lang.Syntax
+import Lang.Lexer
 
 parse :: String -> CoreProgram
 parse = syntax.(flip clex $ 0)

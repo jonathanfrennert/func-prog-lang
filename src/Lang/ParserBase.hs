@@ -1,7 +1,7 @@
-module ParserBase where
+module Lang.ParserBase where
 
-import Syntax
-import Lexer
+import Lang.Syntax
+import Lang.Lexer
 
 import Data.Char
 

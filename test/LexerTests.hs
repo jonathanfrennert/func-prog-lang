@@ -1,6 +1,6 @@
 module LexerTests (lexerTests) where
 
-import Lexer
+import Lang.Lexer
 
 import Test.Hspec
 

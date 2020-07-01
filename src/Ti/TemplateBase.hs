@@ -1,6 +1,6 @@
 module Ti.TemplateBase where
 
-import Syntax
+import Lang.Syntax
 import Utils.Heap
 import Utils.Assoc
 

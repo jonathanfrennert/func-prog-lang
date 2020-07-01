@@ -1,9 +1,9 @@
 module ParserTests (parserTests) where
 
-import Parser
-import ParserBase
-import Lexer
-import Syntax
+import Lang.Parser
+import Lang.ParserBase
+import Lang.Lexer
+import Lang.Syntax
 
 import Test.Hspec
 import Control.Exception (evaluate)

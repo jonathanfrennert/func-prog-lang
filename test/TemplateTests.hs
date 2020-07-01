@@ -2,7 +2,7 @@ module TemplateTests (templateTests) where
 
 import Ti.Template
 import Ti.TemplateBase
-import Syntax
+import Lang.Syntax
 import Utils.Heap
 
 import Test.Hspec

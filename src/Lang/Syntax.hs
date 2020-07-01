@@ -1,4 +1,4 @@
-module Syntax where
+module Lang.Syntax where
 
 data Expr a
   = EVar Name                 -- ^ Variables

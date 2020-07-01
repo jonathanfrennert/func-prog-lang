@@ -1,8 +1,8 @@
 module PPrintTests(pprintTests) where
 
-import PPrint
-import PPrintBase
-import Syntax
+import Lang.PPrint
+import Lang.PPrintBase
+import Lang.Syntax
 
 import Test.Hspec
 import Test.QuickCheck

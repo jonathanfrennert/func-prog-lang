@@ -1,7 +1,7 @@
 module Main where
 
-import PPrint
-import StdPrelude
+import Lang.PPrint
+import Lang.StdPrelude
 
 main :: IO ()
-main = putStr.pprint $ preludeDefs 
+main = putStr.pprint $ preludeDefs

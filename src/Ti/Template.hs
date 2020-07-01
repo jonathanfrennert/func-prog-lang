@@ -1,9 +1,9 @@
 module Ti.Template where
 
 import Ti.TemplateBase
-import Syntax
-import Parser
-import StdPrelude
+import Lang.Syntax
+import Lang.Parser
+import Lang.StdPrelude
 import Utils.Heap
 import Utils.Assoc
 import Utils.Data
