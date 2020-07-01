@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 54c15b47547eaa9fe40741506866e00f634aadce8ac95cf7f7d255e8364fa97d
+-- hash: 5b0910bc402108b4f6e3dd09fa57926fe42b0d912c71ac3647e087f0f958af29
 
 name:           chi
 version:        0.1.0.0
@@ -34,8 +34,8 @@ library
       PPrintBase
       StdPrelude
       Syntax
-      Template
-      TemplateBase
+      Ti.Template
+      Ti.TemplateBase
       Utils.Assoc
       Utils.Data
       Utils.Heap

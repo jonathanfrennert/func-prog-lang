@@ -1,4 +1,4 @@
-module TemplateBase where
+module Ti.TemplateBase where
 
 import Syntax
 import Utils.Heap

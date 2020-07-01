@@ -1,6 +1,6 @@
-module Template where
+module Ti.Template where
 
-import TemplateBase
+import Ti.TemplateBase
 import Syntax
 import Parser
 import StdPrelude
