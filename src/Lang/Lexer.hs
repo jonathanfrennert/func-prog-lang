@@ -1,16 +1,26 @@
-module Lang.Lexer where
+{-|
+Module      : Lang.Lexer
+Description : Lexical analysis
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
+module Lang.Lexer (
+  -- * Type
+  Token (..),
+  -- * Function
+  clex
+  ) where
 
 import Lang.Syntax
 
 import Data.Char
 import Data.List
 
+-- | The Token type is a tuple of the token's line number and the token content.
 type Token = (Int, String)
 
-twoCharOps :: [String]
-twoCharOps = ["==", "˜=", ">=", "<=", "->"]
-
--- | Lexical analysis for language
+-- | Tokenizer
 clex :: String    -- ^ Unprocessed program
      -> Int       -- ^ Current line number
      -> [Token]
@@ -40,3 +50,6 @@ clex (c:cs) n
 
 isVarChar :: Char -> Bool
 isVarChar c = isAlpha c || isDigit c || (c == '_')
+
+twoCharOps :: [String]
+twoCharOps = ["==", "˜=", ">=", "<=", "->"]

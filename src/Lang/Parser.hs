@@ -1,12 +1,77 @@
-module Lang.Parser where
+{-|
+Module      : Lang.Parser
+Description : Language parser
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
+module Lang.Parser (
+  -- * Main functions
+  parse,
+  syntax,
+  -- * Standard syntax parsers
+  pProgram,
+  pSc,
+  pExpr,
+  pLet,
+  pCase,
+  pLambda,
+  pAtomic,
+  pConstr,
+  pBracExpr,
+  pDefns,
+  pDefn,
+  pAlters,
+  pAlter,
+  pArgs,
+  pOneOrMoreWithSemicolon,
+  -- * Infix and function application parsing
+  -- $doc
+  PartialExpr (..),
+  -- ** Booleans
+  pExpr1,
+  pExpr1Snd,
+  pExpr2,
+  pExpr2Snd,
+  -- ** Equivalence relations
+  pExpr3,
+  pExpr3Snd,
+  -- ** Addition and subtraction
+  pExpr4,
+  pExpr4Snd,
+  -- ** Multiplication and division
+  pExpr5,
+  pExpr5Snd,
+  -- ** Function application
+  pExpr6
+) where
 
 import Lang.ParserBase
 import Lang.Syntax
 import Lang.Lexer
 
+-- $doc
+-- Function application must be handled specially as it has left-recursive
+-- grammar. To handle this we rewrite the grammar such that function application
+-- is parsed like a series of atomic expressions, which are then applied
+-- to one another from left to right. Infix operations are special as they have
+-- identical structures, however the operations vary in precedence and
+-- associativity. This is handled by recursively parsing infix expressions as
+-- partial expressions ('PartialExpr'), where a partial expression can either
+-- have no operator or an operator and a core expression. This makes it so
+-- that when we parse infix operations we do not have to reparse an expression
+-- if it turns out to have no infix operator following. Infix parsers always
+-- check if an infix can be parsed by an operator of higher precedence.
+-- Associativity is handled such that if an operator has no associativity, the
+-- parser will only attempt to parse higher precedence operations in the
+-- following expression, this way it is not possible for the operator to
+-- be followed by the same operator.
+
+-- | Attempt to parse a string into an abstract syntax tree.
 parse :: String -> CoreProgram
 parse = syntax.(flip clex $ 0)
 
+-- | Attempt to parse tokens into an abstract syntax tree.
 syntax :: [Token] -> CoreProgram
 syntax = fstP.pProgram
   where
@@ -86,16 +151,14 @@ pArgs = pZeroOrMore pVar
 pOneOrMoreWithSemicolon :: Parser a -> Parser [a]
 pOneOrMoreWithSemicolon p = pOneOrMoreWithSep p (pLit ";")
 
--- | Infix operators & function application
-
+-- | Partial expressions are assembled depending on if they have an
+-- application operation.
 data PartialExpr = NoOp | FoundOp Name CoreExpr
 
+-- | Assemble a partial expression into a core expession.
 assembleOp :: CoreExpr -> PartialExpr -> CoreExpr
 assembleOp e NoOp             = e
 assembleOp e1 (FoundOp op e2) = EAp (EAp (EVar op) e1) e2
-
-
--- | Booleans
 
 pExpr1 :: Parser CoreExpr
 pExpr1 = pThen assembleOp pExpr2 pExpr1Snd
@@ -109,15 +172,11 @@ pExpr2 = pThen assembleOp pExpr3 pExpr2Snd
 pExpr2Snd :: Parser PartialExpr
 pExpr2Snd = (pThen FoundOp (pLit "&") pExpr2) `pAlt` (pEmpty NoOp)
 
--- | Relations
-
 pExpr3 :: Parser CoreExpr
 pExpr3 = pThen assembleOp pExpr4 pExpr3Snd
 
 pExpr3Snd :: Parser PartialExpr
 pExpr3Snd = (pThen FoundOp pRelop pExpr4) `pAlt` (pEmpty NoOp)
-
--- | Addition and subtraction
 
 pExpr4 :: Parser CoreExpr
 pExpr4 = pThen assembleOp pExpr5 pExpr4Snd
@@ -126,16 +185,12 @@ pExpr4Snd :: Parser PartialExpr
 pExpr4Snd = pAlt (pThen FoundOp (pLit "+") pExpr4)
           $ pAlt (pThen FoundOp (pLit "-") pExpr5) (pEmpty NoOp)
 
--- | Multiplication and division
-
 pExpr5 :: Parser CoreExpr
 pExpr5 = pThen assembleOp pExpr6 pExpr5Snd
 
 pExpr5Snd :: Parser PartialExpr
 pExpr5Snd = pAlt (pThen FoundOp (pLit "*") pExpr5)
           $ pAlt (pThen FoundOp (pLit "/") pExpr6) (pEmpty NoOp)
-
--- Function application
 
 pExpr6 :: Parser CoreExpr
 pExpr6 = (pOneOrMore pAtomic) `pApply` mk_app_chain
