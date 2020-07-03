@@ -1,3 +1,9 @@
+{-|
+Module      : Utils.Data
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
 module Utils.Data where
 
 -- | Apply a function to an accumulator and a list of elements

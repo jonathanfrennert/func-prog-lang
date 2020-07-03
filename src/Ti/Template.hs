@@ -1,3 +1,9 @@
+{-|
+Module      : Ti.Template
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
 module Ti.Template where
 
 import Ti.TemplateBase

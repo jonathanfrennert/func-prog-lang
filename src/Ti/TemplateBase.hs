@@ -1,3 +1,9 @@
+{-|
+Module      : Ti.TemplateBase
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
 module Ti.TemplateBase where
 
 import Lang.Syntax
