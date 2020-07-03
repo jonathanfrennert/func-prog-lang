@@ -1,6 +1,5 @@
 {-|
 Module      : Lang.ParserBase
-Description : Parser tools
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental

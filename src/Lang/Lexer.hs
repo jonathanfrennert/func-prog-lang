@@ -1,6 +1,5 @@
 {-|
 Module      : Lang.Lexer
-Description : Lexical analysis
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
@@ -20,7 +19,7 @@ import Data.List
 -- | The Token type is a tuple of the token's line number and the token content.
 type Token = (Int, String)
 
--- | Tokenizer
+-- | Tokenizer.
 clex :: String    -- ^ Unprocessed program
      -> Int       -- ^ Current line number
      -> [Token]

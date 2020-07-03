@@ -1,9 +1,48 @@
-module Lang.PPrint where
+{-|
+Module      : Lang.PPrint
+License     : BSD-3
+Maintainer  : jonathan.frennert@gmail.com
+Stability   : experimental
+-}
+module Lang.PPrint (
+  -- * Main functions
+  pprint,
+  pprProgram,
+  -- * Convert to pretty print type
+  pprSc,
+  pprExpr,
+  pprAlt,
+  pprDefn,
+  pprDefns,
+  pprArgs,
+  -- * Operator precedences
+  appPrec,
+  multPrec,
+  divPrec,
+  addPrec,
+  subPrec,
+  eqPrec,
+  andPrec,
+  orPrec,
+  noPrec
+  ) where
 
 import Lang.PPrintBase
 import Lang.Syntax
 
--- | Operator precedence
+-- | Create a pretty print string for a core program.
+pprint :: CoreProgram -> String
+pprint prog = iDisplay (pprProgram prog)
+
+-- | Convert a core program for pretty printing.
+pprProgram :: CoreProgram -> Iseq
+pprProgram prog = iInterleave (iAppend (iStr " ;") iNewline) (map pprSc prog)
+
+-- | Convert a core program supercombinator for pretty printing.
+pprSc :: CoreScDefn -> Iseq
+pprSc (name, args, body) = iConcat [ iStr name, iSpace, pprArgs args
+                                   , iStr " = ", iIndent $ pprExpr body noPrec]
+
 appPrec, multPrec, divPrec, addPrec, subPrec, eqPrec, andPrec, orPrec, noPrec :: Int
 appPrec   = 6
 multPrec  = 5
@@ -15,18 +54,11 @@ andPrec   = 2
 orPrec    = 1
 noPrec    = 0
 
-pprint :: CoreProgram -> String
-pprint prog = iDisplay (pprProgram prog)
-
-pprProgram :: CoreProgram -> Iseq
-pprProgram prog = iInterleave (iAppend (iStr " ;") iNewline) (map pprSc prog)
-
--- | Pretty Print supercombinator definition
-pprSc :: CoreScDefn -> Iseq
-pprSc (name, args, body) = iConcat [ iStr name, iSpace, pprArgs args
-                                   , iStr " = ", iIndent $ pprExpr body noPrec]
-
-pprExpr :: CoreExpr -> Int -> Iseq
+-- | Convert a core program expression for pretty printing. Operator precedence
+-- is applied to minimize parentheses.
+pprExpr :: CoreExpr   -- ^ Core expression
+        -> Int        -- ^ Current operator precedence
+        -> Iseq
 pprExpr (EVar v) _ = iStr v
 pprExpr (ENum n) _ = iNum n
 
@@ -125,18 +157,22 @@ pprExpr (ELam args body) _        =
   iConcat [ iStr "(\\", pprArgs args, iStr ". ", iIndent $ pprExpr body noPrec
           , iBracR ]
 
--- | Pretty print case alternatives
+-- | Convert a core program case alternative for pretty printing.
 pprAlt :: CoreAlt -> Iseq
 pprAlt (tag, args, rhs) = iConcat [  iStr "<", iNum tag, iStr "> "
                                   ,  pprArgs args,  iStr " -> "
                                   ,  iIndent $ pprExpr rhs noPrec]
 
-pprDefns :: [CoreDefn] -> Iseq
-pprDefns defns = iInterleave iSep (map pprDefn defns)
-
+-- | Convert a core program definition for pretty printing.
 pprDefn :: CoreDefn -> Iseq
 pprDefn (name, e) = iConcat [ iStr name, iStr " = "
                             , iIndent (pprExpr e noPrec) ]
 
+-- | Convert a list of core program definitions for pretty printing. Each
+-- definition is seperated by a semicolon.
+pprDefns :: [CoreDefn] -> Iseq
+pprDefns defns = iInterleave iSep (map pprDefn defns)
+
+-- | Convert a core program list of arguments for pretty printing.
 pprArgs :: [Name] -> Iseq
 pprArgs =  iInterleave iSpace.map iStr

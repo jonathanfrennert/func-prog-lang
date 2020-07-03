@@ -1,6 +1,5 @@
 {-|
 Module      : Lang.Parser
-Description : Language parser
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
@@ -44,7 +43,7 @@ module Lang.Parser (
   pExpr5Snd,
   -- ** Function application
   pExpr6
-) where
+  ) where
 
 import Lang.ParserBase
 import Lang.Syntax
