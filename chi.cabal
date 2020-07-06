@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 57ff6b14d79562e0d854d4c27af013ecd14ce7f52f2db27dc907f41243f9f64a
+-- hash: 20f3889beb38f07f8d5efe0b478e4df4e79044a436cf5cf1b69d9ee781855767
 
 name:           chi
 version:        0.1.0.0
@@ -34,6 +34,7 @@ library
       Lang.PPrintBase
       Lang.StdPrelude
       Lang.Syntax
+      Ti.Eval
       Ti.Template
       Ti.TemplateBase
       Utils.Assoc

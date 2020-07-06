@@ -5,14 +5,12 @@ Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
 -}
 module Ti.Template (
-  -- * Composed function
   runProg,
-  -- * Constituent functions
   compile,
-  eval,
   showResults
   ) where
 
+import Ti.Eval
 import Ti.TemplateBase
 import Lang.Syntax
 import Lang.Parser
@@ -42,17 +40,13 @@ compile prog =
 buildInitialHeap :: CoreProgram -> (TiHeap, TiGlobals)
 buildInitialHeap = mapAccuml allocateSc hInitial
 
--- | Alloate a supercombinator to a heap.
+-- | Allocate a supercombinator to a heap.
 allocateSc :: TiHeap                    -- ^ The heap
            -> CoreScDefn                -- ^ Supercombinator to be allocated
            -> (TiHeap, (Name, Addr))    -- ^ New heap and address association
 allocateSc heap (name, args, body) = ( heap', (name, addr) )
   where
     (heap', addr) = hAlloc heap (NSupercomb name args body)
-
--- | Perform repeated state transitions until a final state is reached.
-eval :: TiState -> [TiState]
-eval = undefined
 
 -- | Format final state result.
 showResults :: [TiState] -> String
