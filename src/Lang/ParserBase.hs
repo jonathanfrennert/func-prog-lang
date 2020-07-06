@@ -53,7 +53,7 @@ pVar :: Parser String
 pVar = pSat isVar
   where
     isVar s = s `notElem` keywords
-            && ( isAlpha.head $ s )
+           && ( isAlpha.head $ s )
 
 relops :: [String]
 relops = ["<", "<=", "==", "~=", ">=", ">"]

@@ -47,7 +47,7 @@ parserTests = hspec $ do
       it "parses 'dangling else' like the C language." $ do
         (parse dangStr) `shouldBe` dangProg
       it "throws an error for non-Core language programs." $ do
-        evaluate (parse unparStr) `shouldThrow` errorCall "Program is unparseable"
+        evaluate (parse unparStr) `shouldThrow` errorCall "Program is unparseable!"
       it "throws an error for syntax errors." $ do
         evaluate (parse syntaxStr) `shouldThrow` errorCall "Syntax error at line 2"
 

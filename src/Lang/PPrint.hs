@@ -44,15 +44,15 @@ pprSc (name, args, body) = iConcat [ iStr name, iSpace, pprArgs args
                                    , iStr " = ", iIndent $ pprExpr body noPrec]
 
 appPrec, multPrec, divPrec, addPrec, subPrec, eqPrec, andPrec, orPrec, noPrec :: Int
-appPrec   = 6
-multPrec  = 5
-divPrec   = 5
-addPrec   = 4
-subPrec   = 4
-eqPrec    = 3
-andPrec   = 2
-orPrec    = 1
-noPrec    = 0
+appPrec  = 6
+multPrec = 5
+divPrec  = 5
+addPrec  = 4
+subPrec  = 4
+eqPrec   = 3
+andPrec  = 2
+orPrec   = 1
+noPrec   = 0
 
 -- | Convert a core program expression for pretty printing. Operator precedence
 -- is applied to minimize parentheses.
@@ -124,7 +124,7 @@ pprExpr (EAp (EAp (EVar "<=") e1) e2) n
 
 pprExpr (EAp (EAp (EVar "&") e1) e2) n
   | n > andPrec  = iConcat [iBracL, and', iBracR]
-  | otherwise   = and'
+  | otherwise    = and'
   where
     and' = iConcat [pprExpr e1 andPrec, iStr " & ", pprExpr e2 andPrec]
 

@@ -30,21 +30,18 @@ clex (c1 : c2 : cs) n
 clex ('\n' : cs) n = clex cs (n + 1)
 clex (c:cs) n
   | isSpace c = clex cs n
-
   | isDigit c =
     let
       num_token = c : takeWhile isDigit cs
       rest_cs   = dropWhile isDigit cs
     in
       (n, num_token) : clex rest_cs n
-
   | isAlpha c =
     let
       var_tok = c : takeWhile isVarChar cs
       rest_cs = dropWhile isVarChar cs
     in
       (n, var_tok) : clex rest_cs n
-
   | otherwise = (n, [c]) : clex cs n
 
 isVarChar :: Char -> Bool

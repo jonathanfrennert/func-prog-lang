@@ -33,7 +33,7 @@ compile prog =
 
     (initial_heap, globals) = buildInitialHeap sc_defs
 
-    initial_stack = [address_of_main]
+    initial_stack   = [address_of_main]
     address_of_main = aLookup globals "main" (error "main is not defined")
 
 -- | Create the heap and globals from a  core program.

@@ -74,7 +74,7 @@ parse = syntax.(flip clex $ 0)
 syntax :: [Token] -> CoreProgram
 syntax = fstP.pProgram
   where
-    fstP []                          = error "Program is unparseable"
+    fstP []                          = error "Program is unparseable!"
     fstP [( _, ( (line, tok) : _) )] = error $ "Syntax error at line " ++ show line
     fstP ( ( prog, [] ) : others )   = prog
     fstP ( parse : others )          = fstP others

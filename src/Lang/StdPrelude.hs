@@ -47,7 +47,7 @@ s = ("S", ["f","g","x"], EAp (EAp (EVar "f") (EVar "x"))
 -- is applied to the second argument, which is applied to the third argument.
 compose :: ScDefn Name
 compose = ("compose", ["f","g","x"], EAp (EVar "f")
-                                         (EAp (EVar "g") (EVar "x")))
+                                    (EAp (EVar "g") (EVar "x")))
 
 -- | The twice operator takes one argument. When applied to any function
 -- argument f, yields a function which takes a single argument and applies
