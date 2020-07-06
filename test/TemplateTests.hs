@@ -11,7 +11,7 @@ templateTests :: IO ()
 templateTests = hspec $ do
   describe "Template" $ do
     describe "compile" $ do
-      it "can create an initial template state for a simple program" $ do
+      it "can create an initial template state for a simple program." $ do
         (tiEqual (compile prog1) p1Init) `shouldBe` True
 
 -- | 'compile' can handle a simple program (2.3.4).
