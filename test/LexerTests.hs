@@ -9,34 +9,34 @@ lexerTests = hspec $ do
   describe "Lexer" $ do
     describe "clex" $ do
       it "can identify digits, variables and exclude whitespaces." $ do
-        (clex ex1Str 0) `shouldBe` ex1
+        (clex digitSpaceVarStr 0) `shouldBe` res1
 
       it "can ignore comments." $ do
-        (clex comStr 0) `shouldBe` comToks
+        (clex commentStr 0) `shouldBe` res2
 
       it "can identify two-char operations." $ do
-        (clex eqStr 0) `shouldBe` eqToks
+        (clex binOpStr 0) `shouldBe` res3
 
 -- | Check if lexer can digits, variables and spaces (1.6.1)
 
-ex1Str :: String
-ex1Str = "123ab  c_de"
+digitSpaceVarStr :: String
+digitSpaceVarStr = "123ab  c_de"
 
-ex1 :: [Token]
-ex1 = [ (0, "123"), (0, "ab"), (0, "c_de") ]
+res1 :: [Token]
+res1 = [ (0, "123"), (0, "ab"), (0, "c_de") ]
 
 -- | Check if the lexer can ignore comments and handle multiple lines (EX 1.9, 1.11).
 
-comStr :: String
-comStr = "123ab  -- HELLLOOOOOOO\nc_de"
+commentStr :: String
+commentStr = "123ab  -- HELLLOOOOOOO\nc_de"
 
-comToks :: [Token]
-comToks = [ (0 , "123"), (0, "ab"), (1, "c_de") ]
+res2 :: [Token]
+res2 = [ (0 , "123"), (0, "ab"), (1, "c_de") ]
 
 -- | Check if the lexer can identify 'twoCharOps' (EX 1.10)
 
-eqStr :: String
-eqStr = "123ab  ==c_de"
+binOpStr :: String
+binOpStr = "123ab  ==c_de"
 
-eqToks :: [Token]
-eqToks = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
+res3 :: [Token]
+res3 = [ (0 , "123"), (0, "ab"), (0, "=="), (0, "c_de") ]
