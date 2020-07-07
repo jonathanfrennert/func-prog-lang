@@ -1,7 +1,7 @@
 module TemplateTests (templateTests) where
 
-import Ti.Template
-import Ti.TemplateBase
+import Comp.Template
+import Comp.TemplateBase
 import Lang.Syntax
 import Utils.Heap
 

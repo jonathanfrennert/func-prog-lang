@@ -1,10 +1,10 @@
 {-|
-Module      : Ti.TemplateBase
+Module      : Comp.TemplateBase
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
 -}
-module Ti.TemplateBase (
+module Comp.TemplateBase (
   -- * Type
   Node (..),
   TiState,

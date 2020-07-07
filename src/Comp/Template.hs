@@ -1,17 +1,17 @@
 {-|
-Module      : Ti.Template
+Module      : Comp.Template
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
 -}
-module Ti.Template (
+module Comp.Template (
   runProg,
   compile,
-  showResults
   ) where
 
-import Ti.Eval
-import Ti.TemplateBase
+import Comp.Eval
+import Comp.Show
+import Comp.TemplateBase
 import Lang.Syntax
 import Lang.Parser
 import Lang.StdPrelude
@@ -47,7 +47,3 @@ allocateSc :: TiHeap                    -- ^ The heap
 allocateSc heap (name, args, body) = ( heap', (name, addr) )
   where
     (heap', addr) = hAlloc heap (NSupercomb name args body)
-
--- | Format final state result.
-showResults :: [TiState] -> String
-showResults = undefined

@@ -1,10 +1,10 @@
 {-|
-Module      : Ti.Eval
+Module      : Comp.Eval
 License     : BSD-3
 Maintainer  : jonathan.frennert@gmail.com
 Stability   : experimental
 -}
-module Ti.Eval (
+module Comp.Eval (
   eval,
   -- ** Step forward
   step,
@@ -17,7 +17,7 @@ module Ti.Eval (
   instLet
   ) where
 
-import Ti.TemplateBase
+import Comp.TemplateBase
 import Lang.Syntax
 import Utils.Heap
 import Utils.Assoc

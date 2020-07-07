@@ -13,7 +13,7 @@ module Lang.ParserBase (
   pVar,
   pRelop,
   pNum,
-  -- * Special parsers
+  -- * Composed parsers
   pAlt,
   pApply,
   pThen,

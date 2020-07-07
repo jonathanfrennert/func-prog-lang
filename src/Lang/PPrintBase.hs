@@ -18,6 +18,7 @@ module Lang.PPrintBase (
   iNewline,
   iNum,
   iSpace,
+  space,
   iBracL,
   iBracR,
   iSep,
