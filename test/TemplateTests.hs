@@ -84,13 +84,13 @@ p1Init = ( [1]
            , ("compose", 8)
            , ("twice", 9)
            ]
-         , 0 )
+         , initialTiStat )
 
 
--- | The compiler can a run a simple program (EX 2.4).
+-- | The interpreter can a run a simple program (EX 2.4).
 skiProg :: String
 skiProg = "main = S K K 3"
 
--- | The compiler will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
+-- | The interpreter will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
 fewArgProg :: String
 fewArgProg = "main = S K K"

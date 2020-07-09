@@ -51,19 +51,24 @@ type TiHeap = Heap Node
 -- name with the address of the heap node containing its definition.
 type TiGlobals = ASSOC Name Addr
 
--- | The statistics measure the number of steps for evaluation.
-type TiStats = Int
+-- | The statistics measure properties of program evaluation.
+data TiStats = TiStats { step :: Int      -- ^ The number of evaluation steps
+                       , pRedex :: Int    -- ^ The number of primitive reductions
+                       , scRedex :: Int   -- ^ The number of supercombinator reductions
+                       , depth :: Int     -- ^ The max stack depth
+                       }
+  deriving (Eq)
 
 initialTiStat :: TiStats
-initialTiStat = 0
+initialTiStat = TiStats 0 0 0 0
 
--- | Update the statistics after a reduction.
+-- | Update the number of steps after a reduction.
 tiStatIncSteps :: TiStats -> TiStats
-tiStatIncSteps s = s + 1
+tiStatIncSteps (TiStats s p sc d) = TiStats (s + 1) p sc d
 
--- | Get the current statistics.
-tiStatGetSteps :: TiStats -> TiStats
-tiStatGetSteps = id
+-- | Get the current number of steps.
+tiStatGetSteps :: TiStats -> Int
+tiStatGetSteps (TiStats s _ _ _) = s
 
 -- | Apply a statistics function to the 'TiStats' component of a 'TiState'.
 applyToStats :: (TiStats -> TiStats) -> TiState -> TiState
