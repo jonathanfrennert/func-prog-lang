@@ -31,14 +31,24 @@ showResults states =
 -- | Shows the state's stack.
 showState :: TiState -> Iseq
 showState (stack, _, heap, _, _)
-  = iConcat [ showStack heap stack, iNewline ]
+  = iConcat [ iInterleave iNewline [ showStack heap stack, showHeap heap ]
+            ]
+
+showHeap :: TiHeap -> Iseq
+showHeap heap
+  = iConcat [ iStr "Hp  ["
+            , iIndent (iInterleave iNewline (map show_heap_item $ hAddresses heap))
+            , iStr " ]" ]
+  where
+    show_heap_item addr = iConcat [showFWAddr addr, iStr ": "
+                                  , showNode (hLookup heap addr) ]
 
 -- | Show all the stack adresses and corresponding heap nodes.
 showStack :: TiHeap -> TiStack -> Iseq
 showStack heap stack
   = iConcat [ iStr "Stk ["
-  , iIndent (iInterleave iNewline (map show_stack_item stack))
-  , iStr " ]" ]
+            , iIndent (iInterleave iNewline (map show_stack_item stack))
+            , iStr " ]" ]
   where
     show_stack_item addr = iConcat [ showFWAddr addr, iStr ": "
                                    , showStkNode heap (hLookup heap addr) ]

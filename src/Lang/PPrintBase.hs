@@ -112,7 +112,7 @@ iConcat = foldr iAppend iNil
 
 -- | Numbered list.
 iLayn :: [Iseq] -> Iseq
-iLayn iqs = iConcat (map lay_item (zip [1..] iqs))
+iLayn iqs = iInterleave iNewline (map lay_item (zip [1..] iqs))
   where
     lay_item (n, iq) =
       iConcat [ iFWNum 4 n, iStr ") ", iIndent iq, iNewline ]
