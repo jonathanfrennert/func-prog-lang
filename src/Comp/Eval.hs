@@ -80,7 +80,8 @@ appStep (stack, dump, heap, globals, stats) a1 a2
 -- addresses in the stack with the address to the supercombinator instantiation.
 scStep :: TiState -> Name -> [Name] -> CoreExpr -> TiState
 scStep (stack, dump, heap, globals, stats) sc_name arg_names body
-  = (new_stack, dump, new_heap, globals, stats)
+  | length stack - 1 < length arg_names = error $ concat ["Supercombinator ", sc_name, " has too few arguments applied!"]
+  | otherwise                           = (new_stack, dump, new_heap, globals, stats)
   where
     new_stack = result_addr : (drop (length arg_names+1) stack)
 

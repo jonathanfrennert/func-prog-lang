@@ -8,6 +8,7 @@ import Lang.Parser
 import Utils.Heap
 
 import Test.Hspec
+import Control.Exception (evaluate)
 
 templateTests :: IO ()
 templateTests = hspec $ do
@@ -20,6 +21,9 @@ templateTests = hspec $ do
     describe "eval" $ do
       it "can evaluate a simple SKI combinator expression." $ do
         (res.last.eval.compile.parse $ skiProg) `shouldBe` (NNum 3)
+    describe "scStep" $ do
+      it "throws an error if a supercombinator or primitive has too few arguments." $ do
+        evaluate (runProg fewArgProg) `shouldThrow` errorCall "Supercombinator S has too few arguments applied!"
 
 -- | Comparison functions
 
@@ -34,7 +38,7 @@ tiEqual (stack, dump, heap, globals, stats) (stack', dump', heap', globals', sta
  && stats == stats'
 
 -- | Check if given heaps are equal. Unused addresses can only be approximately
--- compared as they are infinite lists
+-- compared as they are infinite lists.
 hEqual :: Eq a => Heap a -> Heap a -> Bool
 hEqual (Heap size free accs) (Heap size' free' accs') = size == size'
                                                     && equalInfs free free'
@@ -83,7 +87,10 @@ p1Init = ( [1]
          , 0 )
 
 
--- | 'The compiler can a run a simple program (EX 2.4)
-
+-- | The compiler can a run a simple program (EX 2.4).
 skiProg :: String
 skiProg = "main = S K K 3"
+
+-- | The compiler will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
+fewArgProg :: String
+fewArgProg = "main = S K K"
