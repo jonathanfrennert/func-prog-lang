@@ -1,7 +1,13 @@
 module Main where
 
-import Lang.PPrint
-import Lang.StdPrelude
+import Comp.Template
+
+import System.IO
+import Control.Monad
 
 main :: IO ()
-main = putStr.pprint $ preludeDefs
+main = forever $ do
+  putStr "> "
+  hFlush stdout
+  line <- getLine
+  putStrLn.runProg $ "main = " ++ line

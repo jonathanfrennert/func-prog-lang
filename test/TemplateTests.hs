@@ -1,8 +1,10 @@
 module TemplateTests (templateTests) where
 
+import Comp.Eval
 import Comp.Template
 import Comp.TemplateBase
 import Lang.Syntax
+import Lang.Parser
 import Utils.Heap
 
 import Test.Hspec
@@ -13,6 +15,39 @@ templateTests = hspec $ do
     describe "compile" $ do
       it "can create an initial template state for a simple program." $ do
         (tiEqual (compile prog1) p1Init) `shouldBe` True
+
+  describe "Eval" $ do
+    describe "eval" $ do
+      it "can evaluate a simple SKI combinator expression." $ do
+        (res.last.eval.compile.parse $ skiProg) `shouldBe` (NNum 3)
+
+-- | Comparison functions
+
+-- | Check if the given TiStates are equal. 'TiHeap' can only be approximately
+-- compared as it holds an infinite list of unused addresses.
+tiEqual :: TiState -> TiState -> Bool
+tiEqual (stack, dump, heap, globals, stats) (stack', dump', heap', globals', stats')
+  = stack == stack'
+ && dump  == dump'
+ && hEqual heap heap'
+ && globals == globals'
+ && stats == stats'
+
+-- | Check if given heaps are equal. Unused addresses can only be approximately
+-- compared as they are infinite lists
+hEqual :: Eq a => Heap a -> Heap a -> Bool
+hEqual (Heap size free accs) (Heap size' free' accs') = size == size'
+                                                    && equalInfs free free'
+                                                    && accs == accs'
+
+-- | Check if two infinite integer lists are approximately equal (first 10000 elements are equal).
+equalInfs :: [Int] -> [Int] -> Bool
+equalInfs xs ys = take 10000 xs == take 10000 ys
+
+-- | See the contents a heap (for debugging only).
+pprHeap :: Show a => Heap a -> String
+pprHeap (Heap size _ accs) = concat ["Heap ", show size, " [..] ", show accs]
+
 
 -- | 'compile' can handle a simple program (2.3.4).
 
@@ -48,29 +83,7 @@ p1Init = ( [1]
          , 0 )
 
 
--- | Comparison functions
+-- | 'The compiler can a run a simple program (EX 2.4)
 
--- | Check if the given TiStates are equal. 'TiHeap' can only be approximately
--- compared as it holds an infinite list of unused addresses.
-tiEqual :: TiState -> TiState -> Bool
-tiEqual (stack, dump, heap, globals, stats) (stack', dump', heap', globals', stats')
-  = stack == stack'
- && dump  == dump'
- && hEqual heap heap'
- && globals == globals'
- && stats == stats'
-
--- | Check if given heaps are equal. Unused addresses can only be approximately
--- compared as they are infinite lists
-hEqual :: Eq a => Heap a -> Heap a -> Bool
-hEqual (Heap size free accs) (Heap size' free' accs') = size == size'
-                                                    && equalInfs free free'
-                                                    && accs == accs'
-
--- | Check if two infinite integer lists are approximately equal (first 10000 elements are equal).
-equalInfs :: [Int] -> [Int] -> Bool
-equalInfs xs ys = take 10000 xs == take 10000 ys
-
--- | See the contents a heap (for debugging only).
-pprHeap :: Show a => Heap a -> String
-pprHeap (Heap size _ accs) = concat ["Heap ", show size, " [..] ", show accs]
+skiProg :: String
+skiProg = "main = S K K 3"

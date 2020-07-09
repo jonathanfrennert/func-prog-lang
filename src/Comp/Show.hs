@@ -30,7 +30,7 @@ showResults states =
 
 -- | Shows the state's stack.
 showState :: TiState -> Iseq
-showState (stack, dump, heap, globals, stats)
+showState (stack, _, heap, _, _)
   = iConcat [ showStack heap stack, iNewline ]
 
 -- | Show all the stack adresses and corresponding heap nodes.
@@ -51,14 +51,14 @@ showStkNode heap (NAp fun_addr arg_addr)
             , showFWAddr arg_addr
             , iStr " ("
             , showNode (hLookup heap arg_addr), iStr ")" ]
-showStkNode heap node = showNode node
+showStkNode _ node = showNode node
 
 showNode :: Node -> Iseq
 showNode (NAp a1 a2)                 = iConcat [ iStr "NAp "
                                                , showAddr a1
                                                , iStr " "
                                                , showAddr a2 ]
-showNode (NSupercomb name args body) = iStr ("NSupercomb " ++ name)
+showNode (NSupercomb name _ _)       = iStr ("NSupercomb " ++ name)
 showNode (NNum n)                    = (iStr "NNum ") `iAppend` (iNum n)
 
 showAddr :: Addr -> Iseq
@@ -72,6 +72,6 @@ showFWAddr addr = iStr (space (4 - length str) ++ str)
 
 -- | Show the total number of evaluation steps.
 showStats :: TiState -> Iseq
-showStats (stack, dump, heap, globals, stats)
+showStats (_, _, _, _, stats)
   = iConcat [ iNewline, iNewline, iStr "Total number of steps = "
             , iNum (tiStatGetSteps stats) ]
