@@ -41,7 +41,9 @@ res state@(stack, _, heap, _, _)
 
 -- | Update state statistics.
 doAdmin :: TiState -> TiState
-doAdmin state = applyToStats tiStatIncSteps state
+doAdmin state@(stack, dump, heap, globals, stats) 
+  = applyToStats (tiStatMaxDepth stack)
+  . applyToStats tiStatIncSteps $ state
 
 -- | Check if a given template state is final.
 tiFinal :: TiState -> Bool

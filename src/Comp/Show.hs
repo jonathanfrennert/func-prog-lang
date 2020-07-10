@@ -83,5 +83,7 @@ showFWAddr addr = iStr (space (4 - length str) ++ str)
 -- | Show the total number of evaluation steps.
 showStats :: TiState -> Iseq
 showStats (_, _, _, _, stats)
-  = iConcat [ iNewline, iNewline, iStr "Total number of steps = "
-            , iNum (tiStatGetSteps stats) ]
+  = iConcat [ iNewline
+            , iNewline
+            , iInterleave iNewline [ iStr "Total number of steps = " `iAppend` iNum (tiStatGetSteps stats)
+                                   , iStr "Maximum stack depth   = " `iAppend` iNum (tiStatGetDepth stats) ] ]

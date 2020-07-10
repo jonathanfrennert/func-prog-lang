@@ -18,6 +18,8 @@ module Comp.TemplateBase (
   -- * Operations
   tiStatIncSteps,
   tiStatGetSteps,
+  tiStatMaxDepth,
+  tiStatGetDepth,
   applyToStats
   ) where
 
@@ -52,7 +54,7 @@ type TiHeap = Heap Node
 type TiGlobals = ASSOC Name Addr
 
 -- | The statistics measure properties of program evaluation.
-data TiStats = TiStats { step :: Int      -- ^ The number of evaluation steps
+data TiStats = TiStats { steps :: Int     -- ^ The number of evaluation steps
                        , pRedex :: Int    -- ^ The number of primitive reductions
                        , scRedex :: Int   -- ^ The number of supercombinator reductions
                        , depth :: Int     -- ^ The max stack depth
@@ -66,9 +68,19 @@ initialTiStat = TiStats 0 0 0 0
 tiStatIncSteps :: TiStats -> TiStats
 tiStatIncSteps (TiStats s p sc d) = TiStats (s + 1) p sc d
 
--- | Get the current number of steps.
 tiStatGetSteps :: TiStats -> Int
 tiStatGetSteps (TiStats s _ _ _) = s
+
+-- | Update the max stack depth.
+tiStatMaxDepth :: TiStack -> TiStats -> TiStats
+tiStatMaxDepth stack stats@(TiStats s p sc d)
+    | d' > d    = TiStats s p sc d'
+    | otherwise = stats
+    where
+      d' = length stack
+
+tiStatGetDepth :: TiStats -> Int
+tiStatGetDepth (TiStats _ _ _ d) = d
 
 -- | Apply a statistics function to the 'TiStats' component of a 'TiState'.
 applyToStats :: (TiStats -> TiStats) -> TiState -> TiState
