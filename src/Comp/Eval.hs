@@ -41,15 +41,16 @@ res state@(stack, _, heap, _, _)
 
 -- | Update state statistics.
 doAdmin :: TiState -> TiState
-doAdmin state@(stack, dump, heap, globals, stats) 
-  = applyToStats (tiStatMaxDepth stack)
+doAdmin state@(stack, dump, heap, globals, stats)
+  = applyToStats (tiStatRedex stack heap)
+  . applyToStats (tiStatMaxDepth stack)
   . applyToStats tiStatIncSteps $ state
 
 -- | Check if a given template state is final.
 tiFinal :: TiState -> Bool
 tiFinal ([sole_addr], _, heap, _, _)
                                          = isDataNode (hLookup heap sole_addr)
-tiFinal ([], _, _, _, _) = error "Empty stack!"
+tiFinal ([], _, _, _, _)                 = error "Empty stack!"
 tiFinal state                            = False
 
 -- | Check if a given node is a valid final result.

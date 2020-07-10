@@ -20,6 +20,9 @@ module Comp.TemplateBase (
   tiStatGetSteps,
   tiStatMaxDepth,
   tiStatGetDepth,
+  tiStatRedex,
+  tiStatGetPRedex,
+  tiStatGetScRedex,
   applyToStats
   ) where
 
@@ -55,32 +58,52 @@ type TiGlobals = ASSOC Name Addr
 
 -- | The statistics measure properties of program evaluation.
 data TiStats = TiStats { steps :: Int     -- ^ The number of evaluation steps
-                       , pRedex :: Int    -- ^ The number of primitive reductions
-                       , scRedex :: Int   -- ^ The number of supercombinator reductions
+                       , redex :: (Int, Int)    -- ^ First the number of
+                                                -- primitive reductions and
+                                                -- secondly the number of
+                                                -- supercombinator reductions
+                       , heap  :: Int   -- ^ The number of supercombinator reductions
                        , depth :: Int     -- ^ The max stack depth
                        }
   deriving (Eq)
 
 initialTiStat :: TiStats
-initialTiStat = TiStats 0 0 0 0
+initialTiStat = TiStats 0 (0, 1) 0 0
 
 -- | Update the number of steps after a reduction.
 tiStatIncSteps :: TiStats -> TiStats
-tiStatIncSteps (TiStats s p sc d) = TiStats (s + 1) p sc d
+tiStatIncSteps (TiStats s rx h d) = TiStats (s + 1) rx h d
 
 tiStatGetSteps :: TiStats -> Int
 tiStatGetSteps (TiStats s _ _ _) = s
 
 -- | Update the max stack depth.
 tiStatMaxDepth :: TiStack -> TiStats -> TiStats
-tiStatMaxDepth stack stats@(TiStats s p sc d)
-    | d' > d    = TiStats s p sc d'
+tiStatMaxDepth stack stats@(TiStats s rx h d)
+    | d' > d    = TiStats s rx h d'
     | otherwise = stats
     where
       d' = length stack
 
 tiStatGetDepth :: TiStats -> Int
 tiStatGetDepth (TiStats _ _ _ d) = d
+
+-- | Update the number of reductions for a given type of reduction.
+tiStatRedex :: TiStack -> TiHeap -> TiStats -> TiStats
+tiStatRedex stack heap stats@(TiStats s (p, sc) h d)
+  = identify $ hLookup heap $ head stack
+  where
+    identify (NAp _ _)          = TiStats s (p+1, sc) h d
+    identify (NSupercomb _ _ _) = TiStats s (p , sc+1) h d
+    identify _                  = stats
+
+-- | Get the total number of primitive reductions.
+tiStatGetPRedex :: TiStats -> Int
+tiStatGetPRedex (TiStats _ (p, _) _ _) = p
+
+-- | Get the total number of supercombinator reductions.
+tiStatGetScRedex :: TiStats -> Int
+tiStatGetScRedex (TiStats _ (_, sc) _ _) = sc
 
 -- | Apply a statistics function to the 'TiStats' component of a 'TiState'.
 applyToStats :: (TiStats -> TiStats) -> TiState -> TiState

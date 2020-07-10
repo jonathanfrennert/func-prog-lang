@@ -25,7 +25,10 @@ import Utils.Heap
 -- | Format final state result.
 showResults :: [TiState] -> String
 showResults states =
-  iDisplay.iConcat $ [ iLayn ( map showState states )
+  iDisplay.iConcat $ [ iNewline
+                     , iStr " | EXECUTION"
+                     , iNewline
+                     , iLayn ( map showState states )
                      , showStats ( last states ) ]
 
 -- | Shows the state's stack.
@@ -84,6 +87,15 @@ showFWAddr addr = iStr (space (4 - length str) ++ str)
 showStats :: TiState -> Iseq
 showStats (_, _, _, _, stats)
   = iConcat [ iNewline
+            , iStr " | STATS"
             , iNewline
-            , iInterleave iNewline [ iStr "Total number of steps = " `iAppend` iNum (tiStatGetSteps stats)
-                                   , iStr "Maximum stack depth   = " `iAppend` iNum (tiStatGetDepth stats) ] ]
+            , iInterleave iNewline [ iStr " - Total number of "
+                                   , iStr "   * steps                        = "
+                                     `iAppend` iNum (tiStatGetSteps stats)
+                                   , iStr "   * primitive reductions         = "
+                                     `iAppend` iNum (tiStatGetPRedex stats)
+                                   , iStr "   * supercombinator reductions   = "
+                                     `iAppend` iNum (tiStatGetScRedex stats)
+                                   , iStr " - Maximum stack depth = "
+                                     `iAppend` iNum (tiStatGetDepth stats) ]
+            , iNewline ]
