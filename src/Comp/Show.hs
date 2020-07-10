@@ -83,19 +83,28 @@ showFWAddr addr = iStr (space (4 - length str) ++ str)
   where
     str = show addr
 
--- | Show the total number of evaluation steps.
+-- | Show the evaluation statistics.
 showStats :: TiState -> Iseq
-showStats (_, _, _, _, stats)
+showStats (_, _, heap, _, stats)
   = iConcat [ iNewline
             , iStr " | STATS"
             , iNewline
-            , iInterleave iNewline [ iStr " - Total number of "
+            , iInterleave iNewline [ iStr " - Total"
                                    , iStr "   * steps                        = "
                                      `iAppend` iNum (tiStatGetSteps stats)
                                    , iStr "   * primitive reductions         = "
                                      `iAppend` iNum (tiStatGetPRedex stats)
                                    , iStr "   * supercombinator reductions   = "
                                      `iAppend` iNum (tiStatGetScRedex stats)
-                                   , iStr " - Maximum stack depth = "
+                                   , iStr " - Heap"
+                                   , iStr "   * size              = "
+                                     `iAppend` iNum (hGetSize heap)
+                                   , iStr "   * allocations       = "
+                                     `iAppend` iNum (hGetAlloc heap)
+                                   , iStr "   * updates           = "
+                                     `iAppend` iNum (hGetUpdate heap)
+                                   , iStr "   * addresses freed   = "
+                                     `iAppend` iNum (hGetFree heap)
+                                   , iStr " - Max stack depth = "
                                      `iAppend` iNum (tiStatGetDepth stats) ]
             , iNewline ]
