@@ -63,7 +63,7 @@ prog1 = [ ("main",[],ENum 3)
 p1Init :: TiState
 p1Init = ( [1]
          , DummyTiDump
-         , Heap 9 [10..]
+         , Heap (9,9,0,0) [10..]
              [ (9, NSupercomb "twice" ["f"] (EAp (EAp (EVar "compose") (EVar "f")) (EVar "f")) )
              , (8, NSupercomb "compose" ["f","g","x"] (EAp (EVar "f") (EAp (EVar "g") (EVar "x"))) )
              , (7, NSupercomb "S" ["f","g","x"] (EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x"))) )
