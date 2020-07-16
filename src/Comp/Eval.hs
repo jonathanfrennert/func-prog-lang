@@ -22,6 +22,7 @@ import Comp.TemplateBase
 import Lang.Syntax
 import Utils.Heap
 import Utils.Assoc
+import Utils.Data
 
 
 -- | Perform repeated state transitions until a final state is reached.
@@ -60,10 +61,8 @@ isDataNode node     = False
 
 -- | Step one state forward.
 step :: TiState -> TiState
-step state = dispatch $ hLookup heap $ head stack
+step state@(stack, _, heap, _, _) = dispatch $ hLookup heap $ head stack
   where
-    (stack, _, heap, _, _) = state
-
     dispatch (NNum n)                  = numStep state n
     dispatch (NAp a1 a2)               = appStep state a1 a2
     dispatch (NSupercomb sc args body) = scStep state sc args body
@@ -121,6 +120,12 @@ instConstr _ _ _ _
   = error "Can’t instantiate constructors yet!"
 
 -- | Instantiate let(rec)s. Currently unused.
-instLet :: Bool -> [CoreDefn] -> CoreExpr -> TiHeap -> ASSOC Name Addr -> a
-instLet _ _ _ _ _
-  = error "Can’t instantiate let(rec)s yet!"
+instLet :: Bool -> [CoreDefn] -> CoreExpr -> TiHeap -> ASSOC Name Addr -> (TiHeap, Addr)
+instLet isRec defs body heap env = instantiate body new_heap new_env
+  where
+    (new_heap, addrs) = mapAccuml (\x y -> instantiate y x pass_env) heap (aRange defs)
+    pass_env
+      | isRec     = new_env
+      | otherwise = env
+    new_env           = def_bindings ++ env
+    def_bindings      = zip (aDomain defs) addrs

@@ -23,9 +23,12 @@ templateTests = hspec $ do
     describe "eval" $ do
       it "can evaluate a simple SKI combinator expression." $ do
         (res.last.eval.compile.parse $ skiProg) `shouldBe` (NNum 3)
+
     describe "scStep" $ do
       it "throws an error if a supercombinator or primitive has too few arguments." $ do
         evaluate (runProg fewArgProg) `shouldThrow` errorCall "Supercombinator S has too few arguments applied!"
+      it "can evaluate recursive let statement." $ do
+        (res.last.eval.compile.parse $ recProg) `shouldBe` (NNum 4)
 
   describe "Show" $ do
     describe "showStkTree" $ do
@@ -121,3 +124,15 @@ treeHeap = Heap (9,9,0,0) [10..]
 
 stackTree :: String
 stackTree = "│   ┌── 6 (NSupercomb compose)\n└── 8\n    └── 7\n"
+
+-- | The interpreter can handle recursive let statements (EX 2.11).
+
+recProg :: String
+recProg = "pair x y f = f x y ;\n"
+       ++ "fst p = p K ;\n"
+       ++ "snd p = p K1 ;\n"
+       ++ "f x y = letrec\n"
+       ++ "  a = pair x b ;\n"
+       ++ "  b = pair y a\n"
+       ++ " in\n fst (snd (snd (snd a))) ;\n"
+       ++ "main = f 3 4"
