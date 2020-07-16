@@ -1,10 +1,12 @@
 module TemplateTests (templateTests) where
 
+import Comp.Show
 import Comp.Eval
 import Comp.Template
 import Comp.TemplateBase
 import Lang.Syntax
 import Lang.Parser
+import Lang.PPrintBase
 import Utils.Heap
 
 import Test.Hspec
@@ -24,6 +26,11 @@ templateTests = hspec $ do
     describe "scStep" $ do
       it "throws an error if a supercombinator or primitive has too few arguments." $ do
         evaluate (runProg fewArgProg) `shouldThrow` errorCall "Supercombinator S has too few arguments applied!"
+
+  describe "Show" $ do
+    describe "showStkTree" $ do
+      it "can show a stack tree for an application node." $ do
+        (iDisplay $ showStkTree treeHeap treeStack (iStr "") (iStr "") True) `shouldBe` stackTree
 
 -- | Comparison functions
 
@@ -94,3 +101,23 @@ skiProg = "main = S K K 3"
 -- | The interpreter will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
 fewArgProg :: String
 fewArgProg = "main = S K K"
+
+-- | Show a single application stack tree.
+
+treeStack :: TiStack
+treeStack = [8]
+
+treeHeap :: TiHeap
+treeHeap = Heap (9,9,0,0) [10..]
+    [ (8, NAp 7 6)
+    , (7, NSupercomb "twice" ["f"] (EAp (EAp (EVar "compose") (EVar "f")) (EVar "f")) )
+    , (6, NSupercomb "compose" ["f","g","x"] (EAp (EVar "f") (EAp (EVar "g") (EVar "x"))) )
+    , (5, NSupercomb "S" ["f","g","x"] (EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x"))) )
+    , (4, NSupercomb "K1" ["x","y"] (EVar "y") )
+    , (3, NSupercomb "K" ["x","y"] (EVar "x") )
+    , (2, NSupercomb "I" ["x"] (EVar "x") )
+    , (1, NSupercomb "main" [] (ENum 3) )
+    ]
+
+stackTree :: String
+stackTree = "│   ┌── 6 (NSupercomb compose)\n└── 8\n    └── 7\n"

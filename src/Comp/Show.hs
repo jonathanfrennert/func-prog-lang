@@ -14,6 +14,8 @@ module Comp.Show (
   showStack,
   showStkNode,
   showNode,
+  showStkTree,
+  showStkLeaf,
   showAddr,
   showFWAddr
   ) where
@@ -34,8 +36,16 @@ showResults states =
 -- | Shows the state's stack.
 showState :: TiState -> Iseq
 showState (stack, _, heap, _, _)
-  = iConcat [ iInterleave iNewline [ showStack heap stack, showHeap heap ]
+  = iConcat [ iInterleave iNewline [ showStack heap stack
+                                   , showHeap heap
+                                   , showSpine heap stack ]
             ]
+  where
+    showSpine heap stack = iConcat [ iNewline
+                                   , iStr "Tree (Stk) ──┐"
+                                   , iNewline
+                                   , iStr "             "
+                                   , iIndent (showStkTree heap stack (iStr "") (iStr "") True) ]
 
 showHeap :: TiHeap -> Iseq
 showHeap heap
@@ -46,7 +56,7 @@ showHeap heap
     show_heap_item addr = iConcat [showFWAddr addr, iStr ": "
                                   , showNode (hLookup heap addr) ]
 
--- | Show all the stack adresses and corresponding heap nodes.
+-- | Show all the stack addresses and corresponding heap nodes.
 showStack :: TiHeap -> TiStack -> Iseq
 showStack heap stack
   = iConcat [ iStr "Stk ["
@@ -62,8 +72,9 @@ showStkNode heap (NAp fun_addr arg_addr)
   = iConcat [ iStr "NAp ", showFWAddr fun_addr
             , iStr " "
             , showFWAddr arg_addr
-            , iStr " ("
-            , showNode (hLookup heap arg_addr), iStr ")" ]
+            , iStr "("
+            , showNode $ hLookup heap arg_addr
+            , iStr ")" ]
 showStkNode _ node = showNode node
 
 showNode :: Node -> Iseq
@@ -76,6 +87,71 @@ showNode (NNum n)                    = (iStr "NNum ") `iAppend` (iNum n)
 
 showAddr :: Addr -> Iseq
 showAddr addr = iStr (show addr)
+
+-- | Show an addresses with it contents.
+showAddrNode :: TiHeap -> Addr -> Iseq
+showAddrNode heap addr = iConcat [ showAddr addr
+                                 , iStr " ("
+                                 , showNode $ hLookup heap addr
+                                 , iStr ")" ]
+
+-- | Show a stack tree leaf.
+showStkLeaf :: TiHeap     -- ^ Heap for the given address
+            -> Addr       -- ^ Stack address
+            -> Iseq       -- ^ Prefix
+            -> Bool       -- ^ True if this is the tail, otherwise false
+            -> Iseq
+showStkLeaf heap addr prefix isTail = iConcat [ leaf_prefix
+                                              , addr_format
+                                              , iNewline]
+  where
+    leaf_prefix
+      | isTail    = prefix `iAppend` (iStr "└── ")
+      | otherwise = prefix `iAppend` (iStr "┌── ")
+    addr_format
+      | isTail    = showAddr addr
+      | otherwise = showAddrNode heap addr
+
+-- | Show the stack as a tree.
+showStkTree :: TiHeap     -- ^ Heap for the given stack
+            -> TiStack    -- ^ Stack
+            -> Iseq       -- ^ Buffer
+            -> Iseq       -- ^ Prefix
+            -> Bool       -- ^ True if this is the tail, otherwise false
+            -> Iseq
+showStkTree _ [] def _ _                     = def
+showStkTree heap [addr] buffer prefix isTail = treeify $ hLookup heap addr
+  where
+    treeify (NAp a1 a2) = iConcat [ buffer
+                                  , showStkLeaf heap a2 right_prefix False
+                                  , showStkLeaf heap addr prefix isTail
+                                  , showStkLeaf heap a1 left_prefix True
+                                  ]
+      where
+        right_prefix
+          | isTail    = prefix `iAppend` (iStr "│   ")
+          | otherwise = prefix `iAppend` (iStr "    ")
+        left_prefix
+          | isTail    = prefix `iAppend` (iStr "    ")
+          | otherwise = prefix `iAppend` (iStr "|   ")
+    treeify node        = iConcat [ buffer
+                                  , prefix `iAppend` (iStr "└── ")
+                                  , showAddrNode heap addr
+                                  , iNewline]
+showStkTree heap stack buffer prefix isTail = treeify $ hLookup heap current
+  where
+    current = last stack
+    treeify (NAp a1 a2) = iConcat [ buffer
+                                  , showStkLeaf heap a2 right_prefix False
+                                  , showStkLeaf heap current prefix isTail
+                                  , showStkTree heap (take (length stack - 1) stack) (iStr "") left_prefix True ]
+      where
+        right_prefix
+          | isTail    = prefix `iAppend` (iStr "│   ")
+          | otherwise = prefix `iAppend` (iStr "    ")
+        left_prefix
+          | isTail    = prefix `iAppend` (iStr "    ")
+          | otherwise = prefix `iAppend` (iStr "|   ")
 
 -- | Show a left padded address with width 4.
 showFWAddr :: Addr -> Iseq
