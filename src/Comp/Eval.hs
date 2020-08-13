@@ -119,7 +119,7 @@ instConstr :: Int -> Int -> TiHeap -> ASSOC Name Addr -> a
 instConstr _ _ _ _
   = error "Can’t instantiate constructors yet!"
 
--- | Instantiate let(rec)s. Currently unused.
+-- | Instantiate let(rec)s.
 instLet :: Bool -> [CoreDefn] -> CoreExpr -> TiHeap -> ASSOC Name Addr -> (TiHeap, Addr)
 instLet isRec defs body heap env = instantiate body new_heap new_env
   where

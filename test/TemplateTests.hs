@@ -8,6 +8,8 @@ import Lang.Syntax
 import Lang.Parser
 import Lang.PPrintBase
 import Utils.Heap
+import Utils.Data
+import Utils.Assoc
 
 import Test.Hspec
 import Control.Exception (evaluate)
@@ -29,6 +31,10 @@ templateTests = hspec $ do
         evaluate (runProg fewArgProg) `shouldThrow` errorCall "Supercombinator S has too few arguments applied!"
       it "can evaluate recursive let statement." $ do
         (res.last.eval.compile.parse $ recProg) `shouldBe` (NNum 4)
+
+    describe "instLet" $ do
+      it "can produced the correct environment for let(rec)s." $ do
+        letEx `shouldBe` envEx
 
   describe "Show" $ do
     describe "showStkTree" $ do
@@ -97,11 +103,11 @@ p1Init = ( [1]
          , initialTiStat )
 
 
--- | The interpreter can a run a simple program (EX 2.4).
+-- | The compiler can a run a simple program (EX 2.4).
 skiProg :: String
 skiProg = "main = S K K 3"
 
--- | The interpreter will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
+-- | The compiler will throw an error if a supercombinator or primitive has too few arguments (EX 2.5).
 fewArgProg :: String
 fewArgProg = "main = S K K"
 
@@ -111,7 +117,7 @@ treeStack :: TiStack
 treeStack = [8]
 
 treeHeap :: TiHeap
-treeHeap = Heap (9,9,0,0) [10..]
+treeHeap = Heap (8,8,0,0) [9..]
     [ (8, NAp 7 6)
     , (7, NSupercomb "twice" ["f"] (EAp (EAp (EVar "compose") (EVar "f")) (EVar "f")) )
     , (6, NSupercomb "compose" ["f","g","x"] (EAp (EVar "f") (EAp (EVar "g") (EVar "x"))) )
@@ -125,7 +131,7 @@ treeHeap = Heap (9,9,0,0) [10..]
 stackTree :: String
 stackTree = "│   ┌── 6 (NSupercomb compose)\n└── 8\n    └── 7\n"
 
--- | The interpreter can handle recursive let statements (EX 2.11).
+-- | The compiler can handle recursive let statements (EX 2.11).
 
 recProg :: String
 recProg = "pair x y f = f x y ;\n"
@@ -136,3 +142,29 @@ recProg = "pair x y f = f x y ;\n"
        ++ "  b = pair y a\n"
        ++ " in\n fst (snd (snd (snd a))) ;\n"
        ++ "main = f 3 4"
+
+-- | The environment produced by a recursive let(rec) is as expected (the GHCI is a beautiful thing).
+
+-- | Debug instantiating let(rec)s.
+instLet' :: Bool -> [CoreDefn] -> CoreExpr -> TiHeap -> ASSOC Name Addr -> ASSOC Name Addr
+instLet' isRec defs body heap env = new_env
+  where
+    (new_heap, addrs) = mapAccuml (\x y -> instantiate y x pass_env) heap (aRange defs)
+    pass_env
+      | isRec     = new_env
+      | otherwise = env
+    new_env           = def_bindings ++ env
+    def_bindings      = zip (aDomain defs) addrs
+
+letEx :: ASSOC Name Addr
+letEx = instLet' True defs body heap env
+  where
+    defs = [ ("a", EAp (EAp (EVar "pair") (EVar "x")) (EVar "b"))
+           , ("b", EAp (EAp (EVar "pair") (EVar "y")) (EVar "a"))]
+    body = EAp (EVar "fst") (EAp (EVar "snd") (EAp (EVar "snd") (EAp (EVar "snd") (EVar "a"))))
+    heap = Heap (15, 15,0,0) [16..] []
+    env = []
+
+envEx :: ASSOC Name Addr
+envEx = [ ("a",17)
+        , ("b",19) ]
