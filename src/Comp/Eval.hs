@@ -66,6 +66,7 @@ step state@(stack, _, heap, _, _) = dispatch $ hLookup heap $ head stack
     dispatch (NNum n)                  = numStep state n
     dispatch (NAp a1 a2)               = appStep state a1 a2
     dispatch (NSupercomb sc args body) = scStep state sc args body
+    dispatch (NInd a)                  = indStep state a
 
 -- | A number step throws an error as it should never occur.
 numStep :: TiState -> Int -> TiState
@@ -79,23 +80,30 @@ appStep (stack, dump, heap, globals, stats) a1 a2
 
 -- | The supercombinator rule instantiates the supercombinator definition with
 -- arguments whose heap node address is in the stack, and replaces those
--- addresses in the stack with the address to the supercombinator instantiation.
+-- addresses in the stack with the address to the result. This is pointed to
+-- with an indirection node from the root of the redex in the heap.
 scStep :: TiState -> Name -> [Name] -> CoreExpr -> TiState
 scStep (stack, dump, heap, globals, stats) sc_name arg_names body
   | length stack - 1 < length arg_names = error $ concat ["Supercombinator ", sc_name, " has too few arguments applied!"]
   | otherwise                           = (new_stack, dump, new_heap, globals, stats)
   where
-    new_stack = result_addr : (drop (length arg_names+1) stack)
+    new_stack = drop (length arg_names) stack
+    new_heap  = hUpdate heap' (head new_stack) (NInd result_addr)
 
-    (new_heap, result_addr) = instantiate body heap env
-    env                     = arg_bindings ++ globals
-    arg_bindings            = zip arg_names (getArgs heap stack)
+    (heap', result_addr) = instantiate body heap (arg_bindings ++ globals)
+    arg_bindings         = zip arg_names (getArgs heap stack)
 
 -- | Get heap argument addresses from stack node adresses.
 getArgs :: TiHeap -> TiStack -> [Addr]
 getArgs heap (_ : stack)
   = map get_arg stack
   where get_arg addr = arg where (NAp fun arg) = hLookup heap addr
+
+-- | The indirection rule replaces the root of the redex in the stack with the
+-- result address.
+indStep :: TiState -> Addr -> TiState
+indStep (a : stack, dump, heap, globals, stats) a'
+  = (a' : stack, dump, heap, globals, stats)
 
 -- | Create an instance of an expression in the heap.
 instantiate :: CoreExpr           -- ^ Body of supercombinator

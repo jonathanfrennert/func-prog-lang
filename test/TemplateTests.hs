@@ -168,3 +168,9 @@ letEx = instLet' True defs body heap env
 envEx :: ASSOC Name Addr
 envEx = [ ("a",17)
         , ("b",19) ]
+
+-- | Programs using indirection nodes work correctly (EX 2.13).
+
+indProg :: String
+indProg = "id x = x ;\n"
+       ++ "main = twice twice id 3"

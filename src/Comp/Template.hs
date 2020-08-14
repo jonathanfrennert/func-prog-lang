@@ -20,11 +20,11 @@ import Utils.Assoc
 import Utils.Data
 
 -- | Run a program and return the results.
-runProg :: String   -- ^ Filename containing program
+runProg :: String   -- ^ Code
         -> String
 runProg = showResults.eval.compile.parse
 
--- | produces the initial state of the template instantiation machine.
+-- | Produces the initial state of the template instantiation machine.
 compile :: CoreProgram -> TiState
 compile prog =
   (initial_stack, initialTiDump, initial_heap, globals, initialTiStat)

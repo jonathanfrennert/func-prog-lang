@@ -31,10 +31,11 @@ import Utils.Heap
 import Utils.Assoc
 
 -- | Possible nodes in a heap.
-data Node = NAp Addr Addr             -- ^ Application
-  | NSupercomb Name [Name] CoreExpr   -- ^ Supercombinator
-  | NNum Int                          -- ^ Number
-    deriving (Show, Eq)
+data Node = NAp Addr Addr                     -- ^ Application
+          | NSupercomb Name [Name] CoreExpr   -- ^ Supercombinator
+          | NNum Int                          -- ^ Number
+          | NInd Addr                         -- ^ Indirection
+            deriving (Show, Eq)
 
 -- | Template instantiation state has a stack, dump, heap, globals and statistics.
 type TiState = (TiStack, TiDump, TiHeap, TiGlobals, TiStats)
@@ -62,7 +63,7 @@ data TiStats = TiStats { steps :: Int     -- ^ The number of evaluation steps
                                                 -- primitive reductions and
                                                 -- secondly the number of
                                                 -- supercombinator reductions
-                       , heap  :: Int   -- ^ The number of supercombinator reductions
+                       , heap  :: Int     -- ^ The number of supercombinator reductions
                        , depth :: Int     -- ^ The max stack depth
                        }
   deriving (Eq)

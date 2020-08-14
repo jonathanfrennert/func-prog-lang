@@ -78,12 +78,13 @@ showStkNode heap (NAp fun_addr arg_addr)
 showStkNode _ node = showNode node
 
 showNode :: Node -> Iseq
-showNode (NAp a1 a2)                 = iConcat [ iStr "NAp "
-                                               , showAddr a1
-                                               , iStr " "
-                                               , showAddr a2 ]
-showNode (NSupercomb name _ _)       = iStr ("NSupercomb " ++ name)
-showNode (NNum n)                    = (iStr "NNum ") `iAppend` (iNum n)
+showNode (NAp a1 a2)           = iConcat [ iStr "NAp "
+                                         , showAddr a1
+                                         , iStr " "
+                                         , showAddr a2 ]
+showNode (NSupercomb name _ _) = iStr ("NSupercomb " ++ name)
+showNode (NNum n)              = (iStr "NNum ") `iAppend` (iNum n)
+showNode (NInd addr)           = (iStr "NInd ") `iAppend` (showAddr addr)
 
 showAddr :: Addr -> Iseq
 showAddr addr = iStr (show addr)
@@ -140,7 +141,7 @@ showStkTree heap [addr] buffer prefix isTail = treeify $ hLookup heap addr
                                   , iNewline]
 showStkTree heap stack buffer prefix isTail = treeify $ hLookup heap current
   where
-    current = last stack
+    current             = last stack
     treeify (NAp a1 a2) = iConcat [ buffer
                                   , showStkLeaf heap a2 right_prefix False
                                   , showStkLeaf heap current prefix isTail
