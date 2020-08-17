@@ -1,9 +1,15 @@
-<p align="left">
+<p align="center">
  <img src="/doc/Chi.png" width="150" height="112.5" >
-</p>
+</p> 
 
-# Chi [![Build Status](https://travis-ci.com/J0HNN7G/chi.svg?token=ZvK25wQRVaBqu1vwJ2pP&branch=master)](https://travis-ci.com/J0HNN7G/chi) ![License](https://img.shields.io/github/license/J0HNN7G/chi)
+<p align="center">
+ <a href="https://travis-ci.com/J0HNN7G/chi" alt="Build Status">
+     <img src="https://travis-ci.com/J0HNN7G/chi.svg?branch=master" /></a>
+ <a href="/LICENSE">
+     <img src="https://img.shields.io/github/license/J0HNN7G/chi" /></a>
+</p> 
 
+# Chi
 
  Chi is functional programming language I am making to study functional programming language design and the Curry-Howard isomorphism.
 
