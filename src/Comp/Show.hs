@@ -171,6 +171,8 @@ showStats (_, _, heap, _, stats)
                                      `iAppend` iNum (tiStatGetSteps stats)
                                    , iStr "   * primitive reductions         = "
                                      `iAppend` iNum (tiStatGetPRedex stats)
+                                   , iStr "   * Indirection reductions       = "
+                                     `iAppend` iNum (tiStateGetIndRedex stats)
                                    , iStr "   * supercombinator reductions   = "
                                      `iAppend` iNum (tiStatGetScRedex stats)
                                    , iStr " - Heap"
