@@ -11,6 +11,7 @@ module Comp.Eval (
   step,
   numStep,
   appStep,
+  indStep,
   scStep,
   -- ** Instantiation
   instantiate,

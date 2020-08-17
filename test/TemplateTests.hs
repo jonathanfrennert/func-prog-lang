@@ -26,6 +26,10 @@ templateTests = hspec $ do
       it "can evaluate a simple SKI combinator expression." $ do
         (res.last.eval.compile.parse $ skiProg) `shouldBe` (NNum 3)
 
+    describe "indStep" $ do
+      it "can optimise the evaluation of an 'id' program." $ do
+        (res.last.eval.compile.parse $ indProg) `shouldBe` (NNum 3)
+
     describe "scStep" $ do
       it "throws an error if a supercombinator or primitive has too few arguments." $ do
         evaluate (runProg fewArgProg) `shouldThrow` errorCall "Supercombinator S has too few arguments applied!"
