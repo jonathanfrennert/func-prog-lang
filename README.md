@@ -17,10 +17,7 @@
 
  - [x] The Core language
  - [ ] Template instantiation
- - [ ] The G-machine
  - [ ] Lambda Lifting
- - [ ] Type to theorem function (optional)
- - [ ] Step-by-step evaluation (optional)
 
  ### References
 
