@@ -106,6 +106,21 @@ indStep :: TiState -> Addr -> TiState
 indStep (a : stack, dump, heap, globals, stats) a'
   = (a' : stack, dump, heap, globals, stats)
 
+instantiateAndUpdate :: CoreExpr        -- ^ Body of supercombinator
+                     -> Addr            -- ^ Address of node to update
+                     -> TiHeap          -- ^ Heap before instantiation
+                     -> ASSOC Name Addr -- ^ Association of names to addresses
+                     -> TiHeap
+instantiateAndUpdate (EVar v) upd_addr heap env
+  = hUpdate heap upd_addr (NInd var_addr)  
+    where
+      var_addr = aLookup env v (error ("Undefined name " ++ show v)
+instantiateAndUpdate (EAp e1 e2) upd_addr heap env
+  = hUpdate heap2 upd_addr (NAp a1 a2)
+    where
+      (heap1, a1) = instantiate e1 heap env
+      (heap2, a2) = instantiate e2 heap1 env
+
 -- | Create an instance of an expression in the heap.
 instantiate :: CoreExpr           -- ^ Body of supercombinator
             -> TiHeap             -- ^ Heap before instantiation
