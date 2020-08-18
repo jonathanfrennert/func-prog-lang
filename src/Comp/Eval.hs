@@ -15,8 +15,7 @@ module Comp.Eval (
   scStep,
   -- ** Instantiation
   instantiate,
-  instConstr,
-  instLet
+  instantiateAndUpdate,
   ) where
 
 import Comp.TemplateBase
@@ -89,9 +88,8 @@ scStep (stack, dump, heap, globals, stats) sc_name arg_names body
   | otherwise                           = (new_stack, dump, new_heap, globals, stats)
   where
     new_stack = drop (length arg_names) stack
-    new_heap  = hUpdate heap' (head new_stack) (NInd result_addr)
+    new_heap  =  instantiateAndUpdate body (head new_stack) heap (arg_bindings ++ globals)
 
-    (heap', result_addr) = instantiate body heap (arg_bindings ++ globals)
     arg_bindings         = zip arg_names (getArgs heap stack)
 
 -- | Get heap argument addresses from stack node adresses.
@@ -106,51 +104,63 @@ indStep :: TiState -> Addr -> TiState
 indStep (a : stack, dump, heap, globals, stats) a'
   = (a' : stack, dump, heap, globals, stats)
 
--- | Creates an instance of an expression and updates the result node.
+-- | Creates an instance of an expression and update the result node.
 instantiateAndUpdate :: CoreExpr        -- ^ Body of supercombinator
                      -> Addr            -- ^ Address of node to update
                      -> TiHeap          -- ^ Heap before instantiation
                      -> ASSOC Name Addr -- ^ Association of names to addresses
                      -> TiHeap
+instantiateAndUpdate (ENum n) upd_addr heap env
+  = hUpdate heap upd_addr (NNum n)
+
 instantiateAndUpdate (EVar v) upd_addr heap env
   = hUpdate heap upd_addr (NInd var_addr)
     where
       var_addr = aLookup env v (error ("Undefined name " ++ show v))
+
 instantiateAndUpdate (EAp e1 e2) upd_addr heap env
   = hUpdate heap2 upd_addr (NAp a1 a2)
     where
       (heap1, a1) = instantiate e1 heap env
       (heap2, a2) = instantiate e2 heap1 env
 
+instantiateAndUpdate (ELet isrec defs body) upd_addr heap env
+  = instantiateAndUpdate body upd_addr new_heap new_env
+  where
+    (new_heap, addrs) = mapAccuml (\x y -> instantiate y x pass_env) heap (aRange defs)
+    pass_env
+      | isrec     = new_env
+      | otherwise = env
+    new_env           = def_bindings ++ env
+    def_bindings      = zip (aDomain defs) addrs
+
+instantiateAndUpdate (EConstr tag arity) upd_addr heap env
+  = error "Can’t instantiate constructors yet!"
+
 -- | Create an instance of an expression in the heap.
 instantiate :: CoreExpr           -- ^ Body of supercombinator
             -> TiHeap             -- ^ Heap before instantiation
             -> ASSOC Name Addr    -- ^ Association of names to addresses
             -> (TiHeap, Addr)     -- ^ Heap after instantiation, and address of root of instance
-instantiate (EVar v) heap env               =
-  (heap, aLookup env v (error ("Undefined name " ++ show v)))
 instantiate (ENum n) heap _                 = hAlloc heap (NNum n)
-instantiate (EConstr tag arity) heap env    = instConstr tag arity heap env
+instantiate (EVar v) heap env
+  = (heap, aLookup env v (error ("Undefined name " ++ show v)))
+
 instantiate (EAp e1 e2) heap env            = hAlloc heap2 (NAp a1 a2)
   where
     (heap1, a1) = instantiate e1 heap env
     (heap2, a2) = instantiate e2 heap1 env
-instantiate (ELet isrec defs body) heap env = instLet isrec defs body heap env
-instantiate (ECase _ _) _ _                 =
-  error "Can’t instantiate case expressions!"
 
--- | Instantiate a constructor. Currently unused.
-instConstr :: Int -> Int -> TiHeap -> ASSOC Name Addr -> a
-instConstr _ _ _ _
-  = error "Can’t instantiate constructors yet!"
-
--- | Instantiate let(rec)s.
-instLet :: Bool -> [CoreDefn] -> CoreExpr -> TiHeap -> ASSOC Name Addr -> (TiHeap, Addr)
-instLet isRec defs body heap env = instantiate body new_heap new_env
+instantiate (ELet isrec defs body) heap env = instantiate body new_heap new_env
   where
     (new_heap, addrs) = mapAccuml (\x y -> instantiate y x pass_env) heap (aRange defs)
     pass_env
-      | isRec     = new_env
+      | isrec     = new_env
       | otherwise = env
     new_env           = def_bindings ++ env
     def_bindings      = zip (aDomain defs) addrs
+
+instantiate (EConstr tag arity) heap env
+  = error "Can’t instantiate constructors yet!"
+instantiate (ECase _ _) _ _
+  = error "Can’t instantiate case expressions!"
