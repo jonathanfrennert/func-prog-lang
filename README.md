@@ -11,7 +11,7 @@
 
 # Chi
 
- Chi is functional programming language I am making to learn about functional programming design and the Curry-Howard isomorphism.
+A functional programming language I am making to learn about functional programming design and the Curry-Howard isomorphism.
 
  ### Content
 
