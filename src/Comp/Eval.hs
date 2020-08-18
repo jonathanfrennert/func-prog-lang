@@ -106,15 +106,16 @@ indStep :: TiState -> Addr -> TiState
 indStep (a : stack, dump, heap, globals, stats) a'
   = (a' : stack, dump, heap, globals, stats)
 
+-- | Creates an instance of an expression and updates the result node.
 instantiateAndUpdate :: CoreExpr        -- ^ Body of supercombinator
                      -> Addr            -- ^ Address of node to update
                      -> TiHeap          -- ^ Heap before instantiation
                      -> ASSOC Name Addr -- ^ Association of names to addresses
                      -> TiHeap
 instantiateAndUpdate (EVar v) upd_addr heap env
-  = hUpdate heap upd_addr (NInd var_addr)  
+  = hUpdate heap upd_addr (NInd var_addr)
     where
-      var_addr = aLookup env v (error ("Undefined name " ++ show v)
+      var_addr = aLookup env v (error ("Undefined name " ++ show v))
 instantiateAndUpdate (EAp e1 e2) upd_addr heap env
   = hUpdate heap2 upd_addr (NAp a1 a2)
     where
