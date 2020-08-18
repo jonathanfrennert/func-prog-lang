@@ -24,4 +24,4 @@
 The following are resources I have used to implement Chi.
 
 1.  Peyton Jones, Simon L., and David R. Lester. "*Implementing Functional Languages: a Tutorial*". Prentice Hall, 1992, Microsoft, www.microsoft.com/en-us/research/publication/implementing-functional-languages-a-tutorial/.
-    - This is the literature I am using as guidance for implementing Chi; I aim to cover chapters 1,2 and 6. For anyone wanting to implement a functional programming       language, I cannot recommend this book enough.
+    - I aim to cover chapters 1,2 and 6. For anyone wanting to implement a functional programming language, I cannot recommend this book enough.
