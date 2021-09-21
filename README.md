@@ -13,13 +13,7 @@
 
 A functional programming language I am making to learn about functional programming design and the Curry-Howard isomorphism.
 
- ### Content
-
- - [x] The Core language (Chapter 1)
- - [ ] Template instantiation (Chapter 2)
- - [ ] Lambda Lifting (Chapter 6)
-
- ### References
+### References
 
 The following are resources I have used to implement Chi.
 
